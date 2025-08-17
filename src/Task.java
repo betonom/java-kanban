@@ -38,6 +38,10 @@ public class Task {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setStatus(TaskStatus status) {
         this.status = status;
     }

@@ -64,7 +64,7 @@ public class TaskManager {
     }
 
     public void createNewEpic(Epic epic){
-        tasks.put(epic.getId(), epic);
+        epics.put(epic.getId(), epic);
     }
 
     public void updateEpic(Epic epic){
@@ -80,13 +80,16 @@ public class TaskManager {
     }
 
     public void removeEpicById(int id){
+        Epic epic = getEpicById(id);
+        epic.getSubtasks().clear();
         epics.remove(id);
+
     }
 
     private TaskStatus getStatusEpic(Epic epic){
         boolean allTODO = true;
         boolean allDONE = true;
-        for(Subtask subtask : epic.getSubtasks()){
+        for(Subtask subtask : epic.getSubtasks().values()){
             TaskStatus subtaskStatus = subtask.getStatus();
 
             if(subtaskStatus == TaskStatus.IN_PROGRESS){
@@ -113,7 +116,7 @@ public class TaskManager {
     }
 
     public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
-        return epic.getSubtasks();
+        return (ArrayList<Subtask>) epic.getSubtasks().values();
     }
 
     //Методы для Subtask
@@ -134,7 +137,7 @@ public class TaskManager {
         if(subtask == null){
             return;
         }
-        tasks.put(subtask.getId(), subtask);
+        subtasks.put(subtask.getId(), subtask);
     }
 
     public void updateSubtask(Subtask subtask){
@@ -143,8 +146,11 @@ public class TaskManager {
         }
         if(subtasks.containsKey(subtask.getId())){
             Epic epic = getEpicById(subtask.getEpic_id());
-            epic.setStatus(getStatusEpic(epic));
             subtasks.put(subtask.getId(), subtask);
+            epic.getSubtasks().put(subtask.getId(), subtask);
+            epic.setStatus(getStatusEpic(epic));
+
+
         }
     }
 
