@@ -1,3 +1,5 @@
+package com.github.betonom.java_kanban.entities;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -12,5 +14,4 @@ public class Epic extends Task {
     public ArrayList<Integer> getSubtasksId() {
         return subtasksId;
     }
-
 }

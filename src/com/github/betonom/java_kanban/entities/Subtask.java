@@ -1,3 +1,5 @@
+package com.github.betonom.java_kanban.entities;
+
 public class Subtask extends Task {
     private int epicId;
 

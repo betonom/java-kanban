@@ -1,3 +1,5 @@
+package com.github.betonom.java_kanban.entities;
+
 import java.util.Objects;
 
 public class Task {
@@ -10,6 +12,38 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.TO_DO;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     @Override
@@ -28,37 +62,5 @@ public class Task {
                 Objects.equals(this.description, task.description) &&
                 (this.id == task.id) &&
                 Objects.equals(this.status, task.status);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
-
-    public TaskStatus getStatus() {
-        return this.status;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 }

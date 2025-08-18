@@ -1,3 +1,10 @@
+package com.github.betonom.java_kanban.managers;
+
+import com.github.betonom.java_kanban.entities.Epic;
+import com.github.betonom.java_kanban.entities.Subtask;
+import com.github.betonom.java_kanban.entities.Task;
+import com.github.betonom.java_kanban.entities.TaskStatus;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,7 +24,7 @@ public class TaskManager {
     //Методы для Task
 
     public ArrayList<Task> getTasksList() {
-        return new ArrayList<Task>(tasks.values());
+        return new ArrayList<>(tasks.values());
     }
 
     public void clearTasks() {
@@ -54,7 +61,7 @@ public class TaskManager {
     //Методы для Epic
 
     public ArrayList<Epic> getEpicsList() {
-        return new ArrayList<Epic>(epics.values());
+        return new ArrayList<>(epics.values());
     }
 
     public void clearEpics() {
@@ -88,14 +95,14 @@ public class TaskManager {
     }
 
     public void removeEpicById(int id) {
-        Epic epic = getEpicById(id);
+        Epic epic = epics.get(id);
         epic.getSubtasksId().clear();
         epics.remove(id);
 
     }
 
     private TaskStatus getStatusEpic(Epic epic) {
-        if(epic.getSubtasksId().isEmpty()){
+        if (epic.getSubtasksId().isEmpty()) {
             return TaskStatus.TO_DO;
         }
 
@@ -145,11 +152,11 @@ public class TaskManager {
     //Методы для Subtask
 
     public ArrayList<Subtask> getSubtasksList() {
-        return new ArrayList<Subtask>(subtasks.values());
+        return new ArrayList<>(subtasks.values());
     }
 
     public void clearSubtasks() {
-        for(Epic epic : epics.values()){
+        for (Epic epic : epics.values()) {
             epic.getSubtasksId().clear();
         }
         subtasks.clear();
@@ -192,6 +199,4 @@ public class TaskManager {
         epic.getSubtasksId().remove(id);
         subtasks.remove(id);
     }
-
-
 }
