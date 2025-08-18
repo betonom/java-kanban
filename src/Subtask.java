@@ -1,15 +1,13 @@
-public class Subtask extends Task{
-    private int epic_id;
+public class Subtask extends Task {
+    private int epicId;
 
-    public Subtask(String name, String description, TaskStatus status, int epic_id) {
-        super(name, description, status);
+    public Subtask(String name, String description, int epicId) {
+        super(name, description);
 
-        this.epic_id = epic_id;
+        this.epicId = epicId;
     }
 
-    public int getEpic_id() {
-        return epic_id;
+    public int getEpicId() {
+        return epicId;
     }
-
-
 }

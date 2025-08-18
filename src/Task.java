@@ -1,19 +1,15 @@
 import java.util.Objects;
 
 public class Task {
+    protected int id;
     protected String name;
     protected String description;
-    protected int id;
     protected TaskStatus status;
 
-    public Task (String name, String description, TaskStatus status){
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
-        this.id = TaskManager.taskCounter;
-        this.status = status;
-
-        TaskManager.taskCounter++;
-
+        this.status = TaskStatus.TO_DO;
     }
 
     @Override
@@ -23,9 +19,9 @@ public class Task {
 
     @Override
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if(obj == null) return false;
-        if(this.getClass() != obj.getClass()) return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
 
         Task task = (Task) obj;
         return Objects.equals(this.name, task.name) &&
@@ -46,7 +42,23 @@ public class Task {
         this.status = status;
     }
 
-    public TaskStatus getStatus(){
+    public TaskStatus getStatus() {
         return this.status;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
