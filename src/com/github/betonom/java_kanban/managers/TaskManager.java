@@ -51,7 +51,6 @@ public class TaskManager {
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
         }
-
     }
 
     public void removeTaskById(int id) {
@@ -89,54 +88,15 @@ public class TaskManager {
         if (epics.containsKey(epic.getId())) {
             epic.setStatus(getStatusEpic(epic));
             epics.put(epic.getId(), epic);
-
         }
-
     }
 
     public void removeEpicById(int id) {
         Epic epic = epics.get(id);
-        epic.getSubtasksId().clear();
+        for (Integer subtaskId : epic.getSubtasksId()) {
+            removeSubtaskById(subtaskId);
+        }
         epics.remove(id);
-
-    }
-
-    private TaskStatus getStatusEpic(Epic epic) {
-        if (epic.getSubtasksId().isEmpty()) {
-            return TaskStatus.TO_DO;
-        }
-
-        boolean isAllTODO = true;
-        boolean isAllDONE = true;
-
-        // Получение массива подзадач из эпика
-        ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic);
-
-        for (Subtask subtask : epicSubtasks) {
-
-            TaskStatus subtaskStatus = subtask.getStatus();
-
-            if (subtaskStatus == TaskStatus.IN_PROGRESS) {
-                return TaskStatus.IN_PROGRESS;
-            }
-
-            if (subtaskStatus != TaskStatus.TO_DO) {
-                isAllTODO = false;
-            }
-
-            if (subtaskStatus != TaskStatus.DONE) {
-                isAllDONE = false;
-            }
-        }
-
-        if (isAllTODO) {
-            return TaskStatus.TO_DO;
-        } else if (isAllDONE) {
-            return TaskStatus.DONE;
-        } else {
-            return TaskStatus.IN_PROGRESS;
-        }
-
     }
 
     public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
@@ -170,12 +130,14 @@ public class TaskManager {
         if (subtask == null) {
             return;
         }
+        int epicId = subtasks.get(subtask.getId()).getEpicId();
+        Epic epic = epics.get(epicId);
+        if (epic == null) {
+            return;
+        }
         subtask.setId(taskCounter);
         taskCounter++;
         subtasks.put(subtask.getId(), subtask);
-
-        int epicId = subtasks.get(subtask.getId()).getEpicId();
-        Epic epic = epics.get(epicId);
         epic.getSubtasksId().add(subtask.getId());
     }
 
@@ -196,7 +158,46 @@ public class TaskManager {
     public void removeSubtaskById(int id) {
         int epicId = subtasks.get(id).getEpicId();
         Epic epic = epics.get(epicId);
-        epic.getSubtasksId().remove(id);
+        if (epic != null) {
+            epic.getSubtasksId().remove(id);
+        }
         subtasks.remove(id);
+    }
+
+    private TaskStatus getStatusEpic(Epic epic) {
+        if (epic.getSubtasksId().isEmpty()) {
+            return TaskStatus.TO_DO;
+        }
+
+        boolean isAllTodo = true;
+        boolean isAllDone = true;
+
+        // Получение массива подзадач из эпика
+        ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic);
+
+        for (Subtask subtask : epicSubtasks) {
+
+            TaskStatus subtaskStatus = subtask.getStatus();
+
+            if (subtaskStatus == TaskStatus.IN_PROGRESS) {
+                return TaskStatus.IN_PROGRESS;
+            }
+
+            if (subtaskStatus != TaskStatus.TO_DO) {
+                isAllTodo = false;
+            }
+
+            if (subtaskStatus != TaskStatus.DONE) {
+                isAllDone = false;
+            }
+        }
+
+        if (isAllTodo) {
+            return TaskStatus.TO_DO;
+        } else if (isAllDone) {
+            return TaskStatus.DONE;
+        } else {
+            return TaskStatus.IN_PROGRESS;
+        }
     }
 }
