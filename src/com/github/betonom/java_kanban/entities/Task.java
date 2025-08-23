@@ -58,9 +58,6 @@ public class Task {
         if (this.getClass() != obj.getClass()) return false;
 
         Task task = (Task) obj;
-        return Objects.equals(this.name, task.name) &&
-                Objects.equals(this.description, task.description) &&
-                (this.id == task.id) &&
-                Objects.equals(this.status, task.status);
+        return (this.id == task.id);
     }
 }

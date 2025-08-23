@@ -1,0 +1,203 @@
+package com.github.betonom.java_kanban.managers.inmemory;
+
+import com.github.betonom.java_kanban.entities.Epic;
+import com.github.betonom.java_kanban.entities.Subtask;
+import com.github.betonom.java_kanban.entities.Task;
+import com.github.betonom.java_kanban.managers.TaskManager;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.util.ArrayList;
+
+class InMemoryTaskManagerTest {
+
+    static TaskManager taskManager;
+
+    @BeforeAll
+    static void beforeAll() {
+        taskManager = Managers.getDefault();
+    }
+
+    @Test
+    void createNewTask() {
+        Task newTask = new Task("name", "description");
+        taskManager.createNewTask(newTask);
+
+        Task savedTask = taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertNotNull(savedTask, "Задача не найдена");
+        Assertions.assertEquals(newTask, savedTask, "Задачи не совпадают");
+
+        ArrayList<Task> tasks = taskManager.getTasksList();
+
+        Assertions.assertNotNull(tasks, "Задачи не сохраняются");
+        Assertions.assertEquals(newTask, tasks.get(0), "Задачи не совпадают");
+
+    }
+
+    @Test
+    void updateTask() {
+        Task newTask = new Task("name", "description");
+        taskManager.createNewTask(newTask);
+
+        Task updatedTask = new Task("nameUpdated", "descriptionUpdated");
+        updatedTask.setId(newTask.getId());
+        taskManager.updateTask(updatedTask);
+
+        Task savedTask = taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertNotNull(savedTask, "Задача не найдена");
+        Assertions.assertEquals(updatedTask.getName(), savedTask.getName(), "Имена не совпадают");
+        Assertions.assertEquals(updatedTask.getDescription(), savedTask.getDescription(),
+                "Описания не совпадают");
+
+    }
+
+    @Test
+    void removeTaskById() {
+        Task newTask = new Task("name", "description");
+        taskManager.createNewTask(newTask);
+
+        Task savedTask = taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertNotNull(savedTask, "Задача не найдена");
+
+        taskManager.removeTaskById(newTask.getId());
+
+        savedTask = taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertNull(savedTask, "Задача не удалена");
+    }
+
+    @Test
+    void createNewEpic() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Epic savedEpic = taskManager.getEpicById(newEpic.getId());
+
+        Assertions.assertNotNull(savedEpic, "Задача не найдена");
+        Assertions.assertEquals(newEpic, savedEpic, "Задачи не совпадают");
+
+        ArrayList<Epic> epics = taskManager.getEpicsList();
+
+        Assertions.assertNotNull(epics, "Задачи не сохраняются");
+        Assertions.assertEquals(newEpic, epics.get(0), "Задачи не совпадают");
+    }
+
+    @Test
+    void updateEpic() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+        taskManager.createNewSubtask(subtask2);
+
+        Assertions.assertEquals(newEpic.getSubtasksId().size(), 2, "Подзадачи не привязываются к эпику");
+
+        Epic updatedEpic = new Epic("nameUpdated", "descriptionUpdated");
+        updatedEpic.setId(newEpic.getId());
+        for (Integer subtaskId : newEpic.getSubtasksId()) {
+            updatedEpic.getSubtasksId().add(subtaskId);
+        }
+        taskManager.updateEpic(updatedEpic);
+
+        Epic savedEpic = taskManager.getEpicById(newEpic.getId());
+
+        Assertions.assertNotNull(savedEpic, "Задача не найдена");
+        Assertions.assertEquals(updatedEpic.getName(), savedEpic.getName(), "Имена не совпадают");
+        Assertions.assertEquals(updatedEpic.getDescription(), savedEpic.getDescription(),
+                "Описания не совпадают");
+        Assertions.assertEquals(savedEpic.getSubtasksId(), newEpic.getSubtasksId(),
+                "Привязанные сабтаски не совпадают");
+    }
+
+    @Test
+    void removeEpicById() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+        taskManager.createNewSubtask(subtask2);
+
+        taskManager.removeEpicById(newEpic.getId());
+
+        Assertions.assertNull(taskManager.getEpicById(newEpic.getId()), "Эпик не удалён");
+        Assertions.assertNull(taskManager.getSubtaskById(subtask1.getId()),
+                "Подзадачи не удаляются вместе с эпиком 1");
+        Assertions.assertNull(taskManager.getSubtaskById(subtask2.getId()),
+                "Подзадачи не удаляются вместе с эпиком 2");
+    }
+
+    @Test
+    void createNewSubtask() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        Subtask savedSubtask = taskManager.getSubtaskById(newSubtask.getId());
+
+        Assertions.assertNotNull(savedSubtask, "Задача не найдена");
+        Assertions.assertEquals(newSubtask, savedSubtask, "Задачи не совпадают");
+
+        ArrayList<Subtask> subtasks = taskManager.getSubtasksList();
+
+        Assertions.assertNotNull(subtasks, "Задачи не сохраняются");
+        Assertions.assertEquals(newSubtask, subtasks.get(0), "Задачи не совпадают");
+
+        ArrayList<Integer> subtasksId = newEpic.getSubtasksId();
+
+        Assertions.assertNotNull(subtasksId, "Подзадача не добавилась в соответствующий эпик");
+
+        Subtask subtaskFromEpic = taskManager.getSubtaskById(subtasksId.get(0));
+
+        Assertions.assertEquals(newSubtask, subtaskFromEpic,
+                "Подзадача и подзадача, добавленная в эпик, не совпадают");
+    }
+
+    @Test
+    void updateSubtask() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+
+        Subtask updatedSubtask = new Subtask("nameUpdated", "descriptionUpdated",
+                newSubtask.getEpicId());
+        updatedSubtask.setId(newSubtask.getId());
+        taskManager.updateSubtask(updatedSubtask);
+
+        Subtask savedSubtask = taskManager.getSubtaskById(newSubtask.getId());
+
+
+        Assertions.assertNotNull(savedSubtask, "Задача не найдена");
+        Assertions.assertEquals(updatedSubtask.getName(), savedSubtask.getName(), "Имена не совпадают");
+        Assertions.assertEquals(updatedSubtask.getDescription(), savedSubtask.getDescription(),
+                "Описания не совпадают");
+        Assertions.assertEquals(newSubtask.getEpicId(), savedSubtask.getEpicId(),
+                "Привязанные эпики не совпадают");
+    }
+
+    @Test
+    void removeSubtaskById() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        taskManager.removeSubtaskById(newSubtask.getId());
+
+        Assertions.assertNull(taskManager.getSubtaskById(newSubtask.getId()), "Подзадача не удалена");
+        Assertions.assertEquals(newEpic.getSubtasksId().size(), 0, "Подзадача не удалена из эпика");
+    }
+}
