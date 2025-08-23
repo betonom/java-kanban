@@ -6,7 +6,7 @@ import com.github.betonom.java_kanban.managers.HistoryManager;
 import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private ArrayList<Task> tasksHistory;
+    private final ArrayList<Task> tasksHistory;
     private final int size;
 
     public InMemoryHistoryManager() {
@@ -15,9 +15,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void add(Task task){
-        if(tasksHistory.size() == size){
-           tasksHistory.remove(0);
+    public void add(Task task) {
+        if (tasksHistory.size() == size) {
+            tasksHistory.remove(0);
         }
         tasksHistory.add(task);
     }
@@ -27,7 +27,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasksHistory;
     }
 
-    public int getSize() {
-        return size;
-    }
 }

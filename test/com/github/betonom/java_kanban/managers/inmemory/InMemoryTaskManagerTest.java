@@ -3,9 +3,11 @@ package com.github.betonom.java_kanban.managers.inmemory;
 import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
+import com.github.betonom.java_kanban.entities.TaskStatus;
 import com.github.betonom.java_kanban.managers.TaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -14,8 +16,8 @@ class InMemoryTaskManagerTest {
 
     static TaskManager taskManager;
 
-    @BeforeAll
-    static void beforeAll() {
+    @BeforeEach
+    void beforeEach() {
         taskManager = Managers.getDefault();
     }
 
@@ -199,5 +201,62 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertNull(taskManager.getSubtaskById(newSubtask.getId()), "Подзадача не удалена");
         Assertions.assertEquals(newEpic.getSubtasksId().size(), 0, "Подзадача не удалена из эпика");
+    }
+
+    @Test
+    void shouldBeToDoWhenTaskCreated() {
+        Task newTask = new Task("name", "description");
+        taskManager.createNewTask(newTask);
+
+        Assertions.assertEquals(newTask.getStatus(), TaskStatus.TO_DO,
+                "При создании присваивается не статус TO DO");
+    }
+
+    @Test
+    void shouldEpicStatusBeInProgressWhenSubtasksStatusIsDifferent() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+        taskManager.createNewSubtask(subtask2);
+
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.TO_DO,
+                "Статус не TO_DO при наличии всех подзадач со статусом TO_DO");
+
+        Subtask subtask1c = new Subtask("name 1", "description 1", newEpic.getId());
+        subtask1c.setId(subtask1.getId());
+        subtask1c.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask1c);
+
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.IN_PROGRESS,
+                "Статус не IN_PROGRESS при наличии разных статусов у подзадач");
+
+    }
+
+    @Test
+    void shouldEpicStatusBeDoneWhenSubtasksStatusIsDone() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+        taskManager.createNewSubtask(subtask2);
+
+
+        Subtask subtask1c = new Subtask("name 1", "description 1", newEpic.getId());
+        subtask1c.setId(subtask1.getId());
+        subtask1c.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask1c);
+
+        Subtask subtask2c = new Subtask("name 2", "description 2", newEpic.getId());
+        subtask2c.setId(subtask2.getId());
+        subtask2c.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtask2c);
+
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.DONE,
+                "Статус не DONE при наличии статусов DONE у подзадач");
     }
 }

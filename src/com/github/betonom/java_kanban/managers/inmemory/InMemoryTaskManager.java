@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private HashMap<Integer, Task> tasks;
-    private HashMap<Integer, Epic> epics;
-    private HashMap<Integer, Subtask> subtasks;
-    private HistoryManager historyManager;
+    private final HashMap<Integer, Task> tasks;
+    private final HashMap<Integer, Epic> epics;
+    private final HashMap<Integer, Subtask> subtasks;
+    private final HistoryManager historyManager;
 
     private int taskCounter = 1;
 
@@ -112,7 +112,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpicById(int id) {
         Epic epic = epics.get(id);
         ArrayList<Integer> subtasksId = epic.getSubtasksId();
-        while (subtasksId.size() > 0){
+        while (subtasksId.size() > 0) {
             removeSubtaskById(subtasksId.get(0));
         }
         epics.remove(id);
@@ -172,7 +172,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         if (subtasks.containsKey(subtask.getId())) {
             //проверка на возможное несоответствие epic id у нового и старого subtack
-            if(subtasks.get(subtask.getId()).getEpicId() != subtask.getEpicId()){
+            if (subtasks.get(subtask.getId()).getEpicId() != subtask.getEpicId()) {
                 return;
             }
             int subtaskId = subtask.getId();
@@ -190,7 +190,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(epicId);
         if (epic != null) {
             for (int i = 0; i < epic.getSubtasksId().size(); i++) {
-                if(epic.getSubtasksId().get(i) == id){
+                if (epic.getSubtasksId().get(i) == id) {
                     epic.getSubtasksId().remove(i);
                 }
             }
@@ -236,7 +236,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory(){
+    public ArrayList<Task> getHistory() {
         return historyManager.getHistory();
     }
 }
