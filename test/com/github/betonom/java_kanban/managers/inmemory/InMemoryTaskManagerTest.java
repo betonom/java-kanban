@@ -6,7 +6,6 @@ import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
 import com.github.betonom.java_kanban.managers.TaskManager;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -20,6 +19,8 @@ class InMemoryTaskManagerTest {
     void beforeEach() {
         taskManager = Managers.getDefault();
     }
+
+    //Тесты Task
 
     @Test
     void createNewTask() {
@@ -51,8 +52,7 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertNotNull(savedTask, "Задача не найдена");
         Assertions.assertEquals(updatedTask.getName(), savedTask.getName(), "Имена не совпадают");
-        Assertions.assertEquals(updatedTask.getDescription(), savedTask.getDescription(),
-                "Описания не совпадают");
+        Assertions.assertEquals(updatedTask.getDescription(), savedTask.getDescription(), "Описания не совпадают");
 
     }
 
@@ -71,6 +71,8 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertNull(savedTask, "Задача не удалена");
     }
+
+    //Тесты Epic
 
     @Test
     void createNewEpic() {
@@ -111,10 +113,8 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertNotNull(savedEpic, "Задача не найдена");
         Assertions.assertEquals(updatedEpic.getName(), savedEpic.getName(), "Имена не совпадают");
-        Assertions.assertEquals(updatedEpic.getDescription(), savedEpic.getDescription(),
-                "Описания не совпадают");
-        Assertions.assertEquals(savedEpic.getSubtasksId(), newEpic.getSubtasksId(),
-                "Привязанные сабтаски не совпадают");
+        Assertions.assertEquals(updatedEpic.getDescription(), savedEpic.getDescription(), "Описания не совпадают");
+        Assertions.assertEquals(savedEpic.getSubtasksId(), newEpic.getSubtasksId(), "Привязанные сабтаски не совпадают");
     }
 
     @Test
@@ -130,11 +130,32 @@ class InMemoryTaskManagerTest {
         taskManager.removeEpicById(newEpic.getId());
 
         Assertions.assertNull(taskManager.getEpicById(newEpic.getId()), "Эпик не удалён");
-        Assertions.assertNull(taskManager.getSubtaskById(subtask1.getId()),
-                "Подзадачи не удаляются вместе с эпиком 1");
-        Assertions.assertNull(taskManager.getSubtaskById(subtask2.getId()),
-                "Подзадачи не удаляются вместе с эпиком 2");
+        Assertions.assertNull(taskManager.getSubtaskById(subtask1.getId()), "Подзадачи не удаляются вместе с эпиком 1");
+        Assertions.assertNull(taskManager.getSubtaskById(subtask2.getId()), "Подзадачи не удаляются вместе с эпиком 2");
     }
+
+    @Test
+    void shouldNotSaveSubtaskInEpicWhenSubtaskIsTheEpic() {
+        Epic newEpic = new Epic("name", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        Epic updatedEpic = new Epic("nameUpdated", "descriptionUpdated");
+        updatedEpic.setId(newEpic.getId());
+        for (Integer subtaskId : newEpic.getSubtasksId()) {
+            updatedEpic.getSubtasksId().add(subtaskId);
+        }
+        updatedEpic.getSubtasksId().add(newEpic.getId());
+        taskManager.updateEpic(updatedEpic);
+
+        Epic savedEpic = taskManager.getEpicById(updatedEpic.getId());
+
+        Assertions.assertEquals(savedEpic.getName(), "name", "Эпик не может быть добавлен в себя же в качестве подзадачи");
+    }
+
+    //Тесты Subtask
 
     @Test
     void createNewSubtask() {
@@ -160,8 +181,7 @@ class InMemoryTaskManagerTest {
 
         Subtask subtaskFromEpic = taskManager.getSubtaskById(subtasksId.get(0));
 
-        Assertions.assertEquals(newSubtask, subtaskFromEpic,
-                "Подзадача и подзадача, добавленная в эпик, не совпадают");
+        Assertions.assertEquals(newSubtask, subtaskFromEpic, "Подзадача и подзадача, добавленная в эпик, не совпадают");
     }
 
     @Test
@@ -173,8 +193,7 @@ class InMemoryTaskManagerTest {
         taskManager.createNewSubtask(newSubtask);
 
 
-        Subtask updatedSubtask = new Subtask("nameUpdated", "descriptionUpdated",
-                newSubtask.getEpicId());
+        Subtask updatedSubtask = new Subtask("nameUpdated", "descriptionUpdated", newSubtask.getEpicId());
         updatedSubtask.setId(newSubtask.getId());
         taskManager.updateSubtask(updatedSubtask);
 
@@ -183,10 +202,8 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertNotNull(savedSubtask, "Задача не найдена");
         Assertions.assertEquals(updatedSubtask.getName(), savedSubtask.getName(), "Имена не совпадают");
-        Assertions.assertEquals(updatedSubtask.getDescription(), savedSubtask.getDescription(),
-                "Описания не совпадают");
-        Assertions.assertEquals(newSubtask.getEpicId(), savedSubtask.getEpicId(),
-                "Привязанные эпики не совпадают");
+        Assertions.assertEquals(updatedSubtask.getDescription(), savedSubtask.getDescription(), "Описания не совпадают");
+        Assertions.assertEquals(newSubtask.getEpicId(), savedSubtask.getEpicId(), "Привязанные эпики не совпадают");
     }
 
     @Test
@@ -204,12 +221,28 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
+    void shouldNotSaveSubtaskWhenSubtaskIdEqualsEpicId() {
+        Epic newEpic = new Epic("name 1", "description");
+        taskManager.createNewEpic(newEpic);
+
+        Subtask newSubtask = new Subtask("name 2", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        Subtask updatedSubtask = new Subtask("nameUpdated", "descriptionUpdated", newSubtask.getId());
+        updatedSubtask.setId(newSubtask.getId());
+        taskManager.updateSubtask(updatedSubtask);
+
+        Subtask savedSubtask = taskManager.getSubtaskById(updatedSubtask.getId());
+
+        Assertions.assertEquals(savedSubtask.getName(), "name 2", "Подзадача не может быть собственным эпиком");
+    }
+
+    @Test
     void shouldBeToDoWhenTaskCreated() {
         Task newTask = new Task("name", "description");
         taskManager.createNewTask(newTask);
 
-        Assertions.assertEquals(newTask.getStatus(), TaskStatus.TO_DO,
-                "При создании присваивается не статус TO DO");
+        Assertions.assertEquals(newTask.getStatus(), TaskStatus.TO_DO, "При создании присваивается не статус TO_DO");
     }
 
     @Test
@@ -222,16 +255,14 @@ class InMemoryTaskManagerTest {
         taskManager.createNewSubtask(subtask1);
         taskManager.createNewSubtask(subtask2);
 
-        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.TO_DO,
-                "Статус не TO_DO при наличии всех подзадач со статусом TO_DO");
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.TO_DO, "Статус не TO_DO при наличии всех подзадач со статусом TO_DO");
 
         Subtask subtask1c = new Subtask("name 1", "description 1", newEpic.getId());
         subtask1c.setId(subtask1.getId());
         subtask1c.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(subtask1c);
 
-        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.IN_PROGRESS,
-                "Статус не IN_PROGRESS при наличии разных статусов у подзадач");
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.IN_PROGRESS, "Статус не IN_PROGRESS при наличии разных статусов у подзадач");
 
     }
 
@@ -256,7 +287,6 @@ class InMemoryTaskManagerTest {
         subtask2c.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(subtask2c);
 
-        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.DONE,
-                "Статус не DONE при наличии статусов DONE у подзадач");
+        Assertions.assertEquals(newEpic.getStatus(), TaskStatus.DONE, "Статус не DONE при наличии статусов DONE у подзадач");
     }
 }

@@ -27,4 +27,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasksHistory;
     }
 
+    public int getSize() {
+        return size;
+    }
 }
