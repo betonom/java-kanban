@@ -2,12 +2,13 @@ import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
+import com.github.betonom.java_kanban.managers.InMemoryTaskManager;
 import com.github.betonom.java_kanban.managers.TaskManager;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         Task task1 = new Task("Сделал дело...", "Сделал дело - гуляй смело");
         Task task2 = new Task("Без труда...", "Без труда не выловишь и рыбку из пруда");
