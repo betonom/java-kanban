@@ -2,13 +2,15 @@ import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
-import com.github.betonom.java_kanban.managers.InMemoryTaskManager;
+import com.github.betonom.java_kanban.managers.inmemory.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
+
+import java.util.ArrayList;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new InMemoryTaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Сделал дело...", "Сделал дело - гуляй смело");
         Task task2 = new Task("Без труда...", "Без труда не выловишь и рыбку из пруда");
@@ -47,6 +49,19 @@ public class Main {
         subtask2c.setId(subtask2.getId());
         taskManager.updateSubtask(subtask2c);
 
+        taskManager.getTaskById(1);
+        taskManager.getEpicById(3);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+        taskManager.getSubtaskById(4);
+
+        ArrayList<Task> history = taskManager.getHistory();
 
         Task task2c = new Task("Без труда...", "Без труда не выловишь и рыбку из пруда");
         task2c.setStatus(TaskStatus.DONE);
