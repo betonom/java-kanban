@@ -7,16 +7,17 @@ import java.util.ArrayList;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final ArrayList<Task> tasksHistory;
-    private final int size;
 
     public InMemoryHistoryManager() {
         tasksHistory = new ArrayList<>();
-        size = 10;
     }
 
     @Override
     public void add(Task task) {
-        if (tasksHistory.size() == size) {
+        if (task == null) {
+            return;
+        }
+        if (tasksHistory.size() == SIZE) {
             tasksHistory.remove(0);
         }
         tasksHistory.add(task);
@@ -24,10 +25,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public ArrayList<Task> getHistory() {
-        return tasksHistory;
-    }
-
-    public int getSize() {
-        return size;
+        return new ArrayList<>(tasksHistory);
     }
 }

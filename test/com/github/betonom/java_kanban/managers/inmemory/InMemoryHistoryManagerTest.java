@@ -1,7 +1,7 @@
 package com.github.betonom.java_kanban.managers.inmemory;
 
 import com.github.betonom.java_kanban.entities.Task;
-import com.github.betonom.java_kanban.managers.TaskManager;
+import com.github.betonom.java_kanban.managers.HistoryManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,58 +10,48 @@ import java.util.ArrayList;
 
 class InMemoryHistoryManagerTest {
 
-    static TaskManager taskManager;
+    static HistoryManager historyManager;
+    static Task newTask;
 
     @BeforeEach
     void beforeEach() {
-        taskManager = Managers.getDefault();
+        historyManager = Managers.getDefaultHistory();
+        newTask = new Task("name", "description");
     }
 
     @Test
     void add() {
-        Task newTask = new Task("name", "description");
-        taskManager.createNewTask(newTask);
 
-        taskManager.getTaskById(newTask.getId());
+        historyManager.add(newTask);
 
-        Assertions.assertEquals(taskManager.getHistory().size(), 1, "История задач не изменилась");
-        Assertions.assertEquals(taskManager.getHistory().get(0), newTask, "Задачи не совпадают");
+        Assertions.assertEquals(1, historyManager.getHistory().size(), "История задач не изменилась");
+        Assertions.assertEquals(newTask, historyManager.getHistory().get(0), "Задачи не совпадают");
     }
 
     @Test
     void shouldDeleteOldTaskWhenOverflow() {
-        final int size = 10;
-        Task newTask = new Task("name", "description");
-        taskManager.createNewTask(newTask);
         Task anotherTask = new Task("another name", "another description");
-        taskManager.createNewTask(anotherTask);
 
-        taskManager.getTaskById(newTask.getId());
+        historyManager.add(newTask);
 
-        for (int i = 0; i < size; i++) {
-            taskManager.getTaskById(anotherTask.getId());
+        for (int i = 0; i < historyManager.SIZE; i++) {
+            historyManager.add(anotherTask);
         }
 
-        Task oldTask = taskManager.getHistory().get(0);
+        Task oldTask = historyManager.getHistory().get(0);
 
-        Assertions.assertNotEquals(oldTask.getId(), 1,
+        Assertions.assertNotEquals(1, oldTask.getId(),
                 "Первый элемент в истории не удаляется при переполнении");
     }
 
     @Test
     void shouldSaveOldAndNewVersionsOfSameTasks() {
-        Task newTask = new Task("name", "description");
-        taskManager.createNewTask(newTask);
-
-        taskManager.getTaskById(newTask.getId());
-
+        historyManager.add(newTask);
         Task updatedTask = new Task("nameUpdated", "descriptionUpdated");
         updatedTask.setId(newTask.getId());
-        taskManager.updateTask(updatedTask);
+        historyManager.add(updatedTask);
 
-        taskManager.getTaskById(updatedTask.getId());
-
-        ArrayList<Task> history = taskManager.getHistory();
+        ArrayList<Task> history = historyManager.getHistory();
 
         Assertions.assertEquals(updatedTask.getName(), history.get(1).getName());
         Assertions.assertEquals(newTask.getName(), history.get(0).getName());
