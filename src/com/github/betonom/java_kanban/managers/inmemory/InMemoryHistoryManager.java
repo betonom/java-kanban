@@ -23,6 +23,10 @@ public class InMemoryHistoryManager implements HistoryManager {
         tasksHistory.add(task);
     }
 
+    public void remove(int id){
+        tasksHistory.remove(id);
+    }
+
     @Override
     public ArrayList<Task> getHistory() {
         return new ArrayList<>(tasksHistory);
