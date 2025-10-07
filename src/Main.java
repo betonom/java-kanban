@@ -6,6 +6,7 @@ import com.github.betonom.java_kanban.managers.inmemory.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
@@ -61,7 +62,7 @@ public class Main {
         taskManager.getSubtaskById(4);
         taskManager.getSubtaskById(4);
 
-        ArrayList<Task> history = taskManager.getHistory();
+        List<Task> history = taskManager.getHistory();
 
         Task task2c = new Task("Без труда...", "Без труда не выловишь и рыбку из пруда");
         task2c.setStatus(TaskStatus.DONE);
