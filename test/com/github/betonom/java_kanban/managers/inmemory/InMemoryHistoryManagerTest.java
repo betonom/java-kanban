@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class InMemoryHistoryManagerTest {
 
@@ -29,31 +29,28 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void shouldDeleteOldTaskWhenOverflow() {
-        Task anotherTask = new Task("another name", "another description");
-
+    void remove() {
         historyManager.add(newTask);
 
-        for (int i = 0; i < historyManager.SIZE; i++) {
-            historyManager.add(anotherTask);
-        }
+        Assertions.assertEquals(1, historyManager.getHistory().size(), "История задач не изменилась");
+        Assertions.assertEquals(newTask, historyManager.getHistory().get(0), "Задачи не совпадают");
 
-        Task oldTask = historyManager.getHistory().get(0);
+        historyManager.remove(newTask.getId());
+        Assertions.assertEquals(0, historyManager.getHistory().size(), "История задач не изменилась");
 
-        Assertions.assertNotEquals(1, oldTask.getId(),
-                "Первый элемент в истории не удаляется при переполнении");
     }
 
     @Test
-    void shouldSaveOldAndNewVersionsOfSameTasks() {
+    void shouldNotSaveOldAndNewVersionsOfSameTasks() {
         historyManager.add(newTask);
         Task updatedTask = new Task("nameUpdated", "descriptionUpdated");
         updatedTask.setId(newTask.getId());
         historyManager.add(updatedTask);
 
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
 
-        Assertions.assertEquals(updatedTask.getName(), history.get(1).getName());
-        Assertions.assertEquals(newTask.getName(), history.get(0).getName());
+        Assertions.assertNotEquals(2, history.size(), "Не удаляется дубликат задачи");
     }
+
+
 }

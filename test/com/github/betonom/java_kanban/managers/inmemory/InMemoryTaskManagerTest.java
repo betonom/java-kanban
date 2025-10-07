@@ -35,6 +35,15 @@ class InMemoryTaskManagerTest {
     //Тесты Task
 
     @Test
+    void shouldGetIntoHistoryWhenUsedGetTaskById() {
+
+        taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertEquals(newTask, taskManager.getHistory().get(0),
+                "Задачи не совпадают или задача не была добавлена");
+    }
+
+    @Test
     void createNewTask() {
 
         Task savedTask = taskManager.getTaskById(newTask.getId());
@@ -80,6 +89,15 @@ class InMemoryTaskManagerTest {
     }
 
     //Тесты Epic
+
+    @Test
+    void shouldGetIntoHistoryWhenUsedGetEpicById() {
+
+        taskManager.getEpicById(newEpic.getId());
+
+        Assertions.assertEquals(newEpic, taskManager.getHistory().get(0),
+                "Эпики не совпадают или эпик не был добавлен");
+    }
 
     @Test
     void createNewEpic() {
@@ -159,6 +177,15 @@ class InMemoryTaskManagerTest {
     //Тесты Subtask
 
     @Test
+    void shouldGetIntoHistoryWhenUsedGetSubtaskById() {
+
+        taskManager.getSubtaskById(newSubtask.getId());
+
+        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(0),
+                "Подзадачи не совпадают или подзадача не была добавлена");
+    }
+
+    @Test
     void createNewSubtask() {
         Subtask savedSubtask = taskManager.getSubtaskById(newSubtask.getId());
 
@@ -226,6 +253,8 @@ class InMemoryTaskManagerTest {
                 "Подзадача не может быть собственным эпиком");
     }
 
+    //Общие тесты
+
     @Test
     void shouldBeToDoWhenTaskCreated() {
         Assertions.assertEquals(TaskStatus.TO_DO, newTask.getStatus(),
@@ -269,5 +298,22 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertEquals(TaskStatus.DONE, newEpic.getStatus(),
                 "Статус не DONE при наличии статусов DONE у подзадач");
+    }
+
+    @Test
+    void shouldGetDifferentTypeOfTasksIntoHistory() {
+
+        taskManager.getTaskById(newTask.getId());
+        taskManager.getEpicById(newEpic.getId());
+        taskManager.getSubtaskById(newSubtask.getId());
+
+        Assertions.assertEquals(3, taskManager.getHistory().size(),
+                "Задачи не добавились");
+        Assertions.assertEquals(newTask, taskManager.getHistory().get(0),
+                "Задачи не совпадают или задача не была добавлена");
+        Assertions.assertEquals(newEpic, taskManager.getHistory().get(1),
+                "Эпики не совпадают или эпик не был добавлен");
+        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(2),
+                "Подзадачи не совпадают или подзадача не была добавлена");
     }
 }
