@@ -5,6 +5,7 @@ import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public interface TaskManager {
     ArrayList<Task> getTasksList();
@@ -43,5 +44,5 @@ public interface TaskManager {
 
     void removeSubtaskById(int id);
 
-    ArrayList<Task> getHistory();
+    List<Task> getHistory();
 }
