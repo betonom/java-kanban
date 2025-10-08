@@ -309,11 +309,11 @@ class InMemoryTaskManagerTest {
 
         Assertions.assertEquals(3, taskManager.getHistory().size(),
                 "Задачи не добавились");
-        Assertions.assertEquals(newTask, taskManager.getHistory().get(0),
+        Assertions.assertEquals(newTask, taskManager.getHistory().get(2),
                 "Задачи не совпадают или задача не была добавлена");
         Assertions.assertEquals(newEpic, taskManager.getHistory().get(1),
                 "Эпики не совпадают или эпик не был добавлен");
-        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(2),
+        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(0),
                 "Подзадачи не совпадают или подзадача не была добавлена");
     }
 }
