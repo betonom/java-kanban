@@ -58,7 +58,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         List<Task> tasksHistoryArrayList = new ArrayList<>();
         //Обход с конца, первым элементом будет последний добавленый
         Node node = tail;
-        while (node != null){
+        while (node != null) {
             tasksHistoryArrayList.add(node.data);
             node = node.prev;
         }
@@ -72,13 +72,13 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         if (node.prev != null) {
             node.prev.next = node.next;
-            if(node == tail) {
+            if (node == tail) {
                 tail = node.prev;
             }
         }
         if (node.next != null) {
             node.next.prev = node.prev;
-            if(node == head) {
+            if (node == head) {
                 head = node.next;
             }
         }
