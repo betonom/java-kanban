@@ -57,8 +57,7 @@ class InMemoryHistoryManagerTest {
         historyManager.remove(newTask2.getId());
 
         Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
-        Assertions.assertEquals("name3", historyManager.getHistory().get(0).getName(), "Порядок не сохранился");
-        Assertions.assertEquals("name", historyManager.getHistory().get(1).getName(), "Порядок не сохранился");
+        Assertions.assertEquals(List.of(newTask, newTask3), historyManager.getHistory(), "Порядок не сохранился");
     }
 
     @Test
@@ -77,8 +76,7 @@ class InMemoryHistoryManagerTest {
         historyManager.remove(newTask3.getId());
 
         Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
-        Assertions.assertEquals("name2", historyManager.getHistory().get(0).getName(), "Порядок не сохранился");
-        Assertions.assertEquals("name", historyManager.getHistory().get(1).getName(), "Порядок не сохранился");
+        Assertions.assertEquals(List.of(newTask, newTask2), historyManager.getHistory(), "Порядок не сохранился");
     }
 
     @Test
@@ -97,8 +95,7 @@ class InMemoryHistoryManagerTest {
         historyManager.remove(newTask.getId());
 
         Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
-        Assertions.assertEquals("name3", historyManager.getHistory().get(0).getName(), "Порядок не сохранился");
-        Assertions.assertEquals("name2", historyManager.getHistory().get(1).getName(), "Порядок не сохранился");
+        Assertions.assertEquals(List.of(newTask2, newTask3), historyManager.getHistory(), "Порядок не сохранился");
     }
 
     @Test
