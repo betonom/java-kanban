@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
+import java.util.List;
 
 class InMemoryHistoryManagerTest {
 
@@ -17,6 +17,7 @@ class InMemoryHistoryManagerTest {
     void beforeEach() {
         historyManager = Managers.getDefaultHistory();
         newTask = new Task("name", "description");
+        newTask.setId(1);
     }
 
     @Test
@@ -29,31 +30,84 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void shouldDeleteOldTaskWhenOverflow() {
-        Task anotherTask = new Task("another name", "another description");
-
+    void remove() {
         historyManager.add(newTask);
 
-        for (int i = 0; i < historyManager.SIZE; i++) {
-            historyManager.add(anotherTask);
-        }
+        Assertions.assertEquals(1, historyManager.getHistory().size(), "История задач не изменилась");
+        Assertions.assertEquals(newTask, historyManager.getHistory().get(0), "Задачи не совпадают");
 
-        Task oldTask = historyManager.getHistory().get(0);
+        historyManager.remove(newTask.getId());
+        Assertions.assertEquals(0, historyManager.getHistory().size(), "История задач не изменилась");
 
-        Assertions.assertNotEquals(1, oldTask.getId(),
-                "Первый элемент в истории не удаляется при переполнении");
     }
 
     @Test
-    void shouldSaveOldAndNewVersionsOfSameTasks() {
+    void shouldSaveOrderWhenDeleteTaskInTheMiddle() {
+        Task newTask2 = new Task("name2", "description2");
+        newTask2.setId(2);
+        Task newTask3 = new Task("name3", "description3");
+        newTask3.setId(3);
+
+        historyManager.add(newTask);
+        historyManager.add(newTask2);
+        historyManager.add(newTask3);
+
+        Assertions.assertEquals(3, historyManager.getHistory().size(), "Задачи не добавились");
+
+        historyManager.remove(newTask2.getId());
+
+        Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
+        Assertions.assertEquals(List.of(newTask, newTask3), historyManager.getHistory(), "Порядок не сохранился");
+    }
+
+    @Test
+    void shouldSaveOrderWhenDeleteTaskInTheBeginning() {
+        Task newTask2 = new Task("name2", "description2");
+        newTask2.setId(2);
+        Task newTask3 = new Task("name3", "description3");
+        newTask3.setId(3);
+
+        historyManager.add(newTask);
+        historyManager.add(newTask2);
+        historyManager.add(newTask3);
+
+        Assertions.assertEquals(3, historyManager.getHistory().size(), "Задачи не добавились");
+
+        historyManager.remove(newTask3.getId());
+
+        Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
+        Assertions.assertEquals(List.of(newTask, newTask2), historyManager.getHistory(), "Порядок не сохранился");
+    }
+
+    @Test
+    void shouldSaveOrderWhenDeleteTaskInTheEnd() {
+        Task newTask2 = new Task("name2", "description2");
+        newTask2.setId(2);
+        Task newTask3 = new Task("name3", "description3");
+        newTask3.setId(3);
+
+        historyManager.add(newTask);
+        historyManager.add(newTask2);
+        historyManager.add(newTask3);
+
+        Assertions.assertEquals(3, historyManager.getHistory().size(), "Задачи не добавились");
+
+        historyManager.remove(newTask.getId());
+
+        Assertions.assertEquals(2, historyManager.getHistory().size(), "Задача не удалилась");
+        Assertions.assertEquals(List.of(newTask2, newTask3), historyManager.getHistory(), "Порядок не сохранился");
+    }
+
+    @Test
+    void shouldDeleteOldVersionsOfTheTask() {
         historyManager.add(newTask);
         Task updatedTask = new Task("nameUpdated", "descriptionUpdated");
         updatedTask.setId(newTask.getId());
         historyManager.add(updatedTask);
 
-        ArrayList<Task> history = historyManager.getHistory();
+        List<Task> history = historyManager.getHistory();
 
-        Assertions.assertEquals(updatedTask.getName(), history.get(1).getName());
-        Assertions.assertEquals(newTask.getName(), history.get(0).getName());
+        Assertions.assertNotEquals(2, history.size(), "Не удаляется дубликат задачи");
+        Assertions.assertEquals("nameUpdated", history.get(0).getName(), "Задача не обновилась");
     }
 }

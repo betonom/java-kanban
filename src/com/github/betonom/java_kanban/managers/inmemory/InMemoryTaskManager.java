@@ -9,6 +9,7 @@ import com.github.betonom.java_kanban.managers.TaskManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks;
@@ -34,6 +35,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTasks() {
+        for (Task task : tasks.values()) {
+            historyManager.remove(task.getId());
+        }
         tasks.clear();
     }
 
@@ -66,6 +70,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int id) {
+        historyManager.remove(id);
         tasks.remove(id);
     }
 
@@ -78,6 +83,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearEpics() {
+        for (Task task : epics.values()) {
+            historyManager.remove(task.getId());
+        }
+        for (Task task : subtasks.values()) {
+            historyManager.remove(task.getId());
+        }
         epics.clear();
         subtasks.clear();
     }
@@ -115,6 +126,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeEpicById(int id) {
+        historyManager.remove(id);
+
         Epic epic = epics.get(id);
         ArrayList<Integer> subtasksId = epic.getSubtasksId();
         while (!subtasksId.isEmpty()) {
@@ -142,6 +155,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearSubtasks() {
+        for (Task task : subtasks.values()) {
+            historyManager.remove(task.getId());
+        }
         for (Epic epic : epics.values()) {
             epic.getSubtasksId().clear();
         }
@@ -199,6 +215,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeSubtaskById(int id) {
+        historyManager.remove(id);
+
         int epicId = subtasks.get(id).getEpicId();
         Epic epic = epics.get(epicId);
         if (epic != null) {
@@ -245,7 +263,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 }
