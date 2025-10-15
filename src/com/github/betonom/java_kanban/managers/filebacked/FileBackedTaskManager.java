@@ -6,6 +6,7 @@ import com.github.betonom.java_kanban.managers.inmemory.InMemoryTaskManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -16,33 +17,75 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
+    public void clearTasks() {
+        super.clearTasks();
+        save();
+    }
+
+    @Override
     public void createNewTask(Task task) {
         super.createNewTask(task);
+        save();
     }
 
     @Override
     public void updateTask(Task task) {
         super.updateTask(task);
+        save();
+    }
+
+    @Override
+    public void removeTaskById(int id) {
+        super.removeTaskById(id);
+        save();
+    }
+
+    @Override
+    public void clearEpics() {
+        super.clearEpics();
+        save();
     }
 
     @Override
     public void createNewEpic(Epic epic) {
         super.createNewEpic(epic);
+        save();
     }
 
     @Override
     public void updateEpic(Epic epic) {
         super.updateEpic(epic);
+        save();
+    }
+
+    @Override
+    public void removeEpicById(int id) {
+        super.removeEpicById(id);
+        save();
+    }
+
+    @Override
+    public void clearSubtasks() {
+        super.clearSubtasks();
+        save();
     }
 
     @Override
     public void createNewSubtask(Subtask subtask) {
         super.createNewSubtask(subtask);
+        save();
     }
 
     @Override
     public void updateSubtask(Subtask subtask) {
         super.updateSubtask(subtask);
+        save();
+    }
+
+    @Override
+    public void removeSubtaskById(int id) {
+        super.removeSubtaskById(id);
+        save();
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
