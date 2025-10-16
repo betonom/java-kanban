@@ -92,13 +92,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
-            if (br.ready())
-                br.readLine();
-
             while (br.ready()) {
                 String taskLine = br.readLine();
                 Task task = fileBackedTaskManager.fromString(taskLine);
-
+                if (task == null) {
+                    continue;
+                }
                 if (task.getClass() == Task.class) {
                     fileBackedTaskManager.createNewTask(task);
                 }
@@ -119,18 +118,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8))) {
-            bw.write("id,type,name,status,description,epic");
+            bw.write("id,type,name,status,description,epic\n");
 
             for (Task task : tasks.values()) {
-                bw.write(toString(task));
+                bw.write(toString(task) + "\n");
             }
 
             for (Epic epic : epics.values()) {
-                bw.write(toString(epic));
+                bw.write(toString(epic) + "\n");
             }
 
             for (Subtask subtask : subtasks.values()) {
-                bw.write(toString(subtask));
+                bw.write(toString(subtask) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла проблема с сохранением в файл!");
@@ -138,22 +137,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) {
-        TaskType taskType = TaskType.valueOf(task.getClass().toString().toUpperCase());
-        if (taskType == TaskType.SUBTASK) {
+        if (task == null) {
+            return null;
+        }
+        if (task.getClass() == Subtask.class) {
             Subtask subtask = (Subtask) task;
-            return String.format("%d,%s,%s,%s,%s,$d", subtask.getId(), taskType, subtask.getName(), subtask.getStatus(),
+            return String.format("%d,%s,%s,%s,%s,%d", subtask.getId(), TaskType.SUBTASK, subtask.getName(), subtask.getStatus(),
                     subtask.getDescription(), subtask.getEpicId());
-
-        } else {
-            return String.format("%d,%s,%s,%s,%s,", task.getId(), taskType, task.getName(), task.getStatus(),
+        }
+        if (task.getClass() == Task.class) {
+            return String.format("%d,%s,%s,%s,%s,", task.getId(), TaskType.TASK, task.getName(), task.getStatus(),
                     task.getDescription());
         }
+        if (task.getClass() == Epic.class) {
+            Epic epic = (Epic) task;
+            return String.format("%d,%s,%s,%s,%s,", task.getId(), TaskType.EPIC, task.getName(), task.getStatus(),
+                    task.getDescription());
+        }
+
+        return null;
     }
 
     private Task fromString(String value) {
         String[] taskArray = value.split(",");
-
-        TaskType taskType = TaskType.valueOf(taskArray[1]);
+        TaskType taskType;
+        try {
+            taskType = TaskType.valueOf(taskArray[1]);
+        } catch (Exception e) {
+            return null;
+        }
 
         if (taskType == TaskType.TASK) {
             Task task = new Task(taskArray[2], taskArray[4]);
