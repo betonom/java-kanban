@@ -6,7 +6,6 @@ import com.github.betonom.java_kanban.managers.inmemory.InMemoryTaskManager;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
