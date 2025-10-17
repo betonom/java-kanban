@@ -40,9 +40,9 @@ class FileBackedTaskManagerTest {
 
         fileBackedTaskManager = new FileBackedTaskManager(file);
 
-        Assertions.assertEquals(true, fileBackedTaskManager.getTasksList().isEmpty(), "Что-то пошло не так.");
-        Assertions.assertEquals(true, fileBackedTaskManager.getEpicsList().isEmpty(), "Что-то пошло не так.");
-        Assertions.assertEquals(true, fileBackedTaskManager.getSubtasksList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertTrue(fileBackedTaskManager.getTasksList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertTrue(fileBackedTaskManager.getEpicsList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertTrue(fileBackedTaskManager.getSubtasksList().isEmpty(), "Что-то пошло не так.");
     }
 
     //Task tests
@@ -57,7 +57,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getTasksList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getTasksList().isEmpty(),
                 "Задачи не удалилась из файла");
 
     }
@@ -95,7 +95,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getTasksList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getTasksList().isEmpty(),
                 "Задача не удалилась из файла");
     }
 
@@ -111,7 +111,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getEpicsList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getEpicsList().isEmpty(),
                 "Задачи не удалилась из файла");
     }
 
@@ -148,7 +148,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getEpicsList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getEpicsList().isEmpty(),
                 "Задача не удалилась из файла");
     }
 
@@ -164,7 +164,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getSubtasksList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getSubtasksList().isEmpty(),
                 "Задачи не удалилась из файла");
     }
 
@@ -201,7 +201,7 @@ class FileBackedTaskManagerTest {
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
-        Assertions.assertEquals(true, tmpFbtm.getSubtasksList().isEmpty(),
+        Assertions.assertTrue(tmpFbtm.getSubtasksList().isEmpty(),
                 "Задача не удалилась из файла");
     }
 
