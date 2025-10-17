@@ -2,8 +2,8 @@ package com.github.betonom.java_kanban.utilities;
 
 import com.github.betonom.java_kanban.entities.*;
 
-public class fileBackedUtil {
-    static public String toString(Task task) {
+public class FileBackedUtil {
+    public static String toString(Task task) {
         if (task == null) {
             return null;
         }
@@ -29,7 +29,7 @@ public class fileBackedUtil {
 
     }
 
-    static public Task fromString(String value) {
+    public static Task fromString(String value) {
         String[] taskArray = value.split(",");
         TaskType taskType;
         try {
