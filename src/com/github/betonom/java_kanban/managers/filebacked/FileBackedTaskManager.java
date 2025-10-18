@@ -100,23 +100,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 if (task.getType() == TaskType.TASK) {
                     fileBackedTaskManager.tasks.put(task.getId(), task);
-                    if (task.getId() >= fileBackedTaskManager.taskCounter) {
-                        fileBackedTaskManager.taskCounter = task.getId() + 1;
-                    }
                 }
                 if (task.getType() == TaskType.EPIC) {
                     Epic epic = (Epic) task;
                     fileBackedTaskManager.epics.put(epic.getId(), epic);
-                    if (epic.getId() >= fileBackedTaskManager.taskCounter) {
-                        fileBackedTaskManager.taskCounter = epic.getId() + 1;
-                    }
                 }
                 if (task.getType() == TaskType.SUBTASK) {
                     Subtask subtask = (Subtask) task;
+
+                    int epicId = subtask.getEpicId();
+                    Epic epic = fileBackedTaskManager.epics.get(epicId);
+                    epic.getSubtasksId().add(subtask.getId());
+
                     fileBackedTaskManager.subtasks.put(subtask.getId(), subtask);
-                    if (subtask.getId() >= fileBackedTaskManager.taskCounter) {
-                        fileBackedTaskManager.taskCounter = subtask.getId() + 1;
-                    }
+                }
+                if (task.getId() >= fileBackedTaskManager.taskCounter) {
+                    fileBackedTaskManager.taskCounter = task.getId() + 1;
                 }
             }
         } catch (IOException e) {

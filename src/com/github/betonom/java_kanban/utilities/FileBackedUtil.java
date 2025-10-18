@@ -7,7 +7,7 @@ public class FileBackedUtil {
         if (task == null) {
             return null;
         }
-        String result = switch (task.getType()) {
+        return switch (task.getType()) {
             case TASK, EPIC -> String.format("%d,%s,%s,%s,%s,",
                     task.getId(),
                     task.getType() == TaskType.TASK ? TaskType.TASK : TaskType.EPIC,
@@ -25,7 +25,6 @@ public class FileBackedUtil {
                         subtask.getEpicId());
             }
         };
-        return result;
 
     }
 

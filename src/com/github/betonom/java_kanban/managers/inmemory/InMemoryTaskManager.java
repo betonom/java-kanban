@@ -54,10 +54,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return;
         }
-        if (task.getId() == 0) {
-            task.setId(taskCounter);
-            taskCounter++;
-        }
+
+        task.setId(taskCounter);
+        taskCounter++;
+
         tasks.put(task.getId(), task);
     }
 
@@ -108,10 +108,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
-        if (epic.getId() == 0) {
-            epic.setId(taskCounter);
-            taskCounter++;
-        }
+
+        epic.setId(taskCounter);
+        taskCounter++;
+
         epics.put(epic.getId(), epic);
     }
 
@@ -186,10 +186,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
-        if (subtask.getId() == 0) {
-            subtask.setId(taskCounter);
-            taskCounter++;
-        }
+
+        subtask.setId(taskCounter);
+        taskCounter++;
+
         subtasks.put(subtask.getId(), subtask);
         epic.getSubtasksId().add(subtask.getId());
     }
