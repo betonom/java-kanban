@@ -1,6 +1,7 @@
 package com.github.betonom.java_kanban.managers.inmemory;
 
 import com.github.betonom.java_kanban.managers.HistoryManager;
+import com.github.betonom.java_kanban.managers.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

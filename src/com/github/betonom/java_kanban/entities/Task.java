@@ -34,6 +34,10 @@ public class Task {
         return name;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

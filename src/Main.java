@@ -2,7 +2,7 @@ import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
-import com.github.betonom.java_kanban.managers.inmemory.Managers;
+import com.github.betonom.java_kanban.managers.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
 
 import java.util.List;

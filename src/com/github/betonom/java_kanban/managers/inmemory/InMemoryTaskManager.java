@@ -5,6 +5,7 @@ import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
 import com.github.betonom.java_kanban.managers.HistoryManager;
+import com.github.betonom.java_kanban.managers.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
 
 import java.util.ArrayList;
@@ -12,12 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryTaskManager implements TaskManager {
-    private final HashMap<Integer, Task> tasks;
-    private final HashMap<Integer, Epic> epics;
-    private final HashMap<Integer, Subtask> subtasks;
-    private final HistoryManager historyManager;
+    protected final HashMap<Integer, Task> tasks;
+    protected final HashMap<Integer, Epic> epics;
+    protected final HashMap<Integer, Subtask> subtasks;
+    protected final HistoryManager historyManager;
 
-    private int taskCounter = 1;
+    protected int taskCounter = 1;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
@@ -53,8 +54,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null) {
             return;
         }
+
         task.setId(taskCounter);
         taskCounter++;
+
         tasks.put(task.getId(), task);
     }
 
@@ -105,8 +108,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
+
         epic.setId(taskCounter);
         taskCounter++;
+
         epics.put(epic.getId(), epic);
     }
 
@@ -181,8 +186,10 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic == null) {
             return;
         }
+
         subtask.setId(taskCounter);
         taskCounter++;
+
         subtasks.put(subtask.getId(), subtask);
         epic.getSubtasksId().add(subtask.getId());
     }
