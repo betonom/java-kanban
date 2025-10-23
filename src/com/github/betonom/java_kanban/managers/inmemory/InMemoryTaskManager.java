@@ -311,20 +311,16 @@ public class InMemoryTaskManager implements TaskManager {
         return duration;
     }
 
-    private LocalDateTime getStartTimeEpic (Epic epic) {
-        if (epic.getSubtasksId().isEmpty()) {
-            return LocalDateTime.now();
-        }
-
+    private LocalDateTime getStartTimeEpic(Epic epic) {
         ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic);
 
         Optional opt = epicSubtasks.stream().min((subtask1, subtask2) -> {
-            if (subtask1.getStartTime().isAfter(subtask2.getStartTime())) {
+            if (subtask1.getStartTime() == null || subtask2.getStartTime() == null
+                    || subtask1.getStartTime().isAfter(subtask2.getStartTime())) {
                 return 1;
             } else if (subtask1.getStartTime().isBefore(subtask2.getStartTime())) {
                 return -1;
-            }
-            else {
+            } else {
                 return 0;
             }
 
@@ -333,27 +329,22 @@ public class InMemoryTaskManager implements TaskManager {
         if (opt.isPresent()) {
             Subtask subtask = (Subtask) opt.get();
             return subtask.getStartTime();
-        }
-        else {
+        } else {
             return null;
         }
 
     }
 
-    private LocalDateTime getEndTimeEpic (Epic epic) {
-        if (epic.getSubtasksId().isEmpty()) {
-            return LocalDateTime.now();
-        }
-
+    private LocalDateTime getEndTimeEpic(Epic epic) {
         ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic);
 
         Optional opt = epicSubtasks.stream().max((subtask1, subtask2) -> {
-            if (subtask1.getStartTime().isAfter(subtask2.getStartTime())) {
-                return 1;
-            } else if (subtask1.getStartTime().isBefore(subtask2.getStartTime())) {
+            if (subtask1.getStartTime() == null || subtask2.getStartTime() == null
+                    || subtask1.getStartTime().isBefore(subtask2.getStartTime()))
                 return -1;
-            }
-            else {
+            else if (subtask1.getStartTime().isAfter(subtask2.getStartTime())) {
+                return 1;
+            } else {
                 return 0;
             }
 
@@ -361,9 +352,10 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (opt.isPresent()) {
             Subtask subtask = (Subtask) opt.get();
-            return subtask.getStartTime();
-        }
-        else {
+            if (subtask.getStartTime() == null)
+                return null;
+            return subtask.getStartTime().plus(subtask.getDuration());
+        } else {
             return null;
         }
 

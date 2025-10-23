@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 class InMemoryTaskManagerTest {
@@ -30,6 +32,8 @@ class InMemoryTaskManagerTest {
         taskManager.createNewEpic(newEpic);
 
         newSubtask = new Subtask("name", "description", newEpic.getId());
+        newSubtask.setDuration(Duration.ofMinutes(5));
+        newSubtask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 1));
         taskManager.createNewSubtask(newSubtask);
     }
 
@@ -317,4 +321,42 @@ class InMemoryTaskManagerTest {
         Assertions.assertEquals(newSubtask, taskManager.getHistory().get(2),
                 "Подзадачи не совпадают или подзадача не была добавлена");
     }
+
+    @Test
+    void shouldEpicDurationBeTheSumOfSubtasksDuration() {
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        subtask1.setDuration(Duration.ofMinutes(5));
+        taskManager.createNewSubtask(subtask1);
+
+        Assertions.assertEquals(Duration.ofMinutes(10), newEpic.getDuration(),
+                "Неправильный расчет поля duration в Epic");
+    }
+
+    @Test
+    void shouldEpicStartTimeBeMinOfSubtasksStartTimeAndIgnoreSubtasksStartTimeOfNull() {
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        subtask1.setStartTime(LocalDateTime.of(2020, 1, 1, 1, 1));
+        taskManager.createNewSubtask(subtask1);
+
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+
+        Assertions.assertEquals(LocalDateTime.of(2000, 1, 1, 1, 1), newEpic.getStartTime(),
+                "Неправильный расчет поля startTime в Epic");
+    }
+
+    @Test
+    void shouldEpicEndTimeBeMaxOfSubtasksStartTimePlusDurationAndIgnoreSubtasksStartTimeOfNull() {
+        Subtask subtask1 = new Subtask("name 1", "description 1", newEpic.getId());
+        subtask1.setStartTime(LocalDateTime.of(2020, 1, 1, 1, 1));
+        subtask1.setDuration(Duration.ofMinutes(5));
+        taskManager.createNewSubtask(subtask1);
+
+        Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
+        taskManager.createNewSubtask(subtask1);
+
+        Assertions.assertEquals(LocalDateTime.of(2020, 1, 1, 1, 6), newEpic.getEndTime(),
+                "Неправильный расчет поля endTime в Epic");
+    }
+
 }

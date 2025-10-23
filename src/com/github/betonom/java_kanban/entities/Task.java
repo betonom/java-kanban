@@ -17,7 +17,6 @@ public class Task {
         this.description = description;
         this.status = TaskStatus.TO_DO;
         this.duration = Duration.ofSeconds(0);
-        this.startTime = LocalDateTime.now();
     }
 
     public int getId() {

@@ -3,7 +3,7 @@ package com.github.betonom.java_kanban.managers.filebacked;
 import com.github.betonom.java_kanban.entities.*;
 import com.github.betonom.java_kanban.exceptions.ManagerSaveException;
 import com.github.betonom.java_kanban.managers.inmemory.InMemoryTaskManager;
-import com.github.betonom.java_kanban.utilities.FileBackedUtil;
+import com.github.betonom.java_kanban.utilities.TaskManagerUtil;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -94,7 +94,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader br = new BufferedReader(new FileReader(file, StandardCharsets.UTF_8))) {
             while (br.ready()) {
                 String taskLine = br.readLine();
-                Task task = FileBackedUtil.fromString(taskLine);
+                Task task = TaskManagerUtil.fromString(taskLine);
                 if (task == null) {
                     continue;
                 }
@@ -129,15 +129,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             bw.write("id,type,name,status,description,epic\n");
 
             for (Task task : tasks.values()) {
-                bw.write(FileBackedUtil.toString(task) + "\n");
+                bw.write(TaskManagerUtil.toString(task) + "\n");
             }
 
             for (Epic epic : epics.values()) {
-                bw.write(FileBackedUtil.toString(epic) + "\n");
+                bw.write(TaskManagerUtil.toString(epic) + "\n");
             }
 
             for (Subtask subtask : subtasks.values()) {
-                bw.write(FileBackedUtil.toString(subtask) + "\n");
+                bw.write(TaskManagerUtil.toString(subtask) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла проблема с сохранением в файл!");

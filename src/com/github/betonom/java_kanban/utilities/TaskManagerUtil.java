@@ -5,7 +5,7 @@ import com.github.betonom.java_kanban.entities.*;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class FileBackedUtil {
+public class TaskManagerUtil {
     public static String toString(Task task) {
         if (task == null) {
             return null;
@@ -17,7 +17,7 @@ public class FileBackedUtil {
                     task.getName(),
                     task.getStatus(),
                     task.getDescription(),
-                    task.getStartTime().toString(),
+                    task.getStartTime() == null ? "null" : task.getStartTime().toString(),
                     task.getDuration().toMinutes());
 
             case EPIC -> {
@@ -28,9 +28,9 @@ public class FileBackedUtil {
                         epic.getName(),
                         epic.getStatus(),
                         epic.getDescription(),
-                        epic.getStartTime().toString(),
+                        epic.getStartTime() == null ? "null" : task.getStartTime().toString(),
                         epic.getDuration().toMinutes(),
-                        epic.getEndTime().toString());
+                        epic.getEndTime() == null ? "null" : epic.getEndTime().toString());
             }
 
             case SUBTASK -> {
@@ -42,7 +42,7 @@ public class FileBackedUtil {
                         subtask.getStatus(),
                         subtask.getDescription(),
                         subtask.getEpicId(),
-                        subtask.getStartTime().toString(),
+                        subtask.getStartTime() == null ? "null" : task.getStartTime().toString(),
                         subtask.getDuration().toMinutes());
             }
         };
@@ -63,7 +63,8 @@ public class FileBackedUtil {
 
             task.setId(Integer.parseInt(taskArray[0]));
             task.setStatus(TaskStatus.valueOf(taskArray[3]));
-            task.setStartTime(LocalDateTime.parse(taskArray[6]));
+            if (!taskArray[6].equals("null"))
+                task.setStartTime(LocalDateTime.parse(taskArray[6]));
             task.setDuration(Duration.ofMinutes(Integer.parseInt(taskArray[7])));
 
             return task;
@@ -73,9 +74,11 @@ public class FileBackedUtil {
             Epic epic = new Epic(taskArray[2], taskArray[4]);
             epic.setId(Integer.parseInt(taskArray[0]));
             epic.setStatus(TaskStatus.valueOf(taskArray[3]));
-            epic.setStartTime(LocalDateTime.parse(taskArray[6]));
+            if (!taskArray[6].equals("null"))
+                epic.setStartTime(LocalDateTime.parse(taskArray[6]));
             epic.setDuration(Duration.ofMinutes(Integer.parseInt(taskArray[7])));
-            epic.setEndTime(LocalDateTime.parse(taskArray[8]));
+            if (!taskArray[8].equals("null"))
+                epic.setEndTime(LocalDateTime.parse(taskArray[8]));
 
             return epic;
         }
@@ -84,7 +87,8 @@ public class FileBackedUtil {
             Subtask subtask = new Subtask(taskArray[2], taskArray[4], Integer.parseInt(taskArray[5]));
             subtask.setId(Integer.parseInt(taskArray[0]));
             subtask.setStatus(TaskStatus.valueOf(taskArray[3]));
-            subtask.setStartTime(LocalDateTime.parse(taskArray[6]));
+            if (!taskArray[6].equals("null"))
+                subtask.setStartTime(LocalDateTime.parse(taskArray[6]));
             subtask.setDuration(Duration.ofMinutes(Integer.parseInt(taskArray[7])));
 
             return subtask;
