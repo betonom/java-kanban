@@ -96,4 +96,23 @@ public class TaskManagerUtil {
 
         return null;
     }
+
+    public static boolean isTasksCross(Task task1, Task task2) {
+        if (task1.getStartTime() == null || task2.getStartTime() == null)
+            return false;
+
+        if (task1.getStartTime().isBefore(task2.getStartTime())) {
+            if (task1.getEndTime().isBefore(task2.getStartTime())) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            if (task2.getEndTime().isBefore(task1.getStartTime())) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
 }

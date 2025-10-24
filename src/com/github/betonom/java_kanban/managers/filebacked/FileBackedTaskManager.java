@@ -7,6 +7,7 @@ import com.github.betonom.java_kanban.utilities.TaskManagerUtil;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Collectors;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -121,6 +122,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Произошла проблема с сохранением в файл!");
         }
+
+        fileBackedTaskManager.prioritizedTasks.addAll(
+                fileBackedTaskManager.tasks.values().stream()
+                        .filter(task -> task.getStartTime() != null)
+                        .collect(Collectors.toList())
+        );
+        fileBackedTaskManager.prioritizedTasks.addAll(
+                fileBackedTaskManager.subtasks.values().stream()
+                        .filter(task -> task.getStartTime() != null)
+                        .collect(Collectors.toList())
+        );
+
         return fileBackedTaskManager;
     }
 
