@@ -3,57 +3,63 @@ package com.github.betonom.java_kanban.managers.filebacked;
 import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
+import com.github.betonom.java_kanban.exceptions.ManagerSaveException;
+import com.github.betonom.java_kanban.managers.TaskManager;
+import com.github.betonom.java_kanban.managers.TaskManagerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.List;
 
-class FileBackedTaskManagerTest {
+class FileBackedTaskManagerTest extends TaskManagerTest<TaskManager> {
     static File file;
-    static FileBackedTaskManager fileBackedTaskManager;
-    static Task newTask;
-    static Epic newEpic;
-    static Subtask newSubtask;
 
     @BeforeEach
-    void beforeEach() throws IOException {
+    protected void beforeEach() {
+        Assertions.assertDoesNotThrow(() -> {
+            file = File.createTempFile("tmp", ".txt");
+        });
 
-        file = File.createTempFile("tmp", ".txt");
-
-        fileBackedTaskManager = new FileBackedTaskManager(file);
+        Assertions.assertDoesNotThrow(() -> {
+            taskManager = FileBackedTaskManager.loadFromFile(file);
+        }, "Подгрузка из существующего файла не должна вызывать исключение");
 
         newTask = new Task("name", "description");
-        fileBackedTaskManager.createNewTask(newTask);
+        newTask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 2));
+        Assertions.assertDoesNotThrow(() -> {
+            taskManager.createNewTask(newTask);
+        });
 
         newEpic = new Epic("name", "description");
-        fileBackedTaskManager.createNewEpic(newEpic);
+        taskManager.createNewEpic(newEpic);
 
         newSubtask = new Subtask("name", "description", newEpic.getId());
-        fileBackedTaskManager.createNewSubtask(newSubtask);
+        newSubtask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 1));
+        taskManager.createNewSubtask(newSubtask);
     }
 
     @Test
-    void shouldLoadFromEmptyFile() throws IOException {
-        File file = File.createTempFile("tmp", ".txt");
+    void shouldThrowsManagerSaveExceptionWhenThereIsNotAFile() {
+        file = new File("test.txt");
 
-        fileBackedTaskManager = new FileBackedTaskManager(file);
-
-        Assertions.assertTrue(fileBackedTaskManager.getTasksList().isEmpty(), "Что-то пошло не так.");
-        Assertions.assertTrue(fileBackedTaskManager.getEpicsList().isEmpty(), "Что-то пошло не так.");
-        Assertions.assertTrue(fileBackedTaskManager.getSubtasksList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertThrows(ManagerSaveException.class, () -> {
+            FileBackedTaskManager.loadFromFile(file);
+        }, "Подгрузка из несуществующего файла должна вызывать исключение");
     }
 
     //Task tests
 
     @Test
-    public void clearTasks() {
+    void clearTasks() {
         Task newTask2 = new Task("name2", "description2");
 
-        fileBackedTaskManager.createNewTask(newTask2);
+        taskManager.createNewTask(newTask2);
 
-        fileBackedTaskManager.clearTasks();
+        taskManager.clearTasks();
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -66,7 +72,7 @@ class FileBackedTaskManagerTest {
     void createNewTask() {
         Task newTask2 = new Task("name2", "description2");
 
-        fileBackedTaskManager.createNewTask(newTask2);
+        taskManager.createNewTask(newTask2);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -81,7 +87,7 @@ class FileBackedTaskManagerTest {
         Task savedTask = new Task("updatedName", "updatedDescription");
         savedTask.setId(newTask.getId());
 
-        fileBackedTaskManager.updateTask(savedTask);
+        taskManager.updateTask(savedTask);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -91,7 +97,7 @@ class FileBackedTaskManagerTest {
 
     @Test
     void removeTaskById() {
-        fileBackedTaskManager.removeTaskById(newTask.getId());
+        taskManager.removeTaskById(newTask.getId());
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -105,9 +111,9 @@ class FileBackedTaskManagerTest {
     void clearEpics() {
         Epic newEpic2 = new Epic("name2", "description2");
 
-        fileBackedTaskManager.createNewEpic(newEpic2);
+        taskManager.createNewEpic(newEpic2);
 
-        fileBackedTaskManager.clearEpics();
+        taskManager.clearEpics();
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -119,7 +125,7 @@ class FileBackedTaskManagerTest {
     void createNewEpic() {
         Epic newEpic2 = new Epic("name2", "description2");
 
-        fileBackedTaskManager.createNewEpic(newEpic2);
+        taskManager.createNewEpic(newEpic2);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -134,7 +140,7 @@ class FileBackedTaskManagerTest {
         Epic savedEpic = new Epic("updatedName", "updatedDescription");
         savedEpic.setId(newEpic.getId());
 
-        fileBackedTaskManager.updateEpic(savedEpic);
+        taskManager.updateEpic(savedEpic);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -144,7 +150,7 @@ class FileBackedTaskManagerTest {
 
     @Test
     void removeEpicById() {
-        fileBackedTaskManager.removeEpicById(newEpic.getId());
+        taskManager.removeEpicById(newEpic.getId());
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -158,9 +164,9 @@ class FileBackedTaskManagerTest {
     void clearSubtasks() {
         Subtask newSubtask2 = new Subtask("name2", "description2", newEpic.getId());
 
-        fileBackedTaskManager.createNewSubtask(newSubtask2);
+        taskManager.createNewSubtask(newSubtask2);
 
-        fileBackedTaskManager.clearSubtasks();
+        taskManager.clearSubtasks();
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -172,7 +178,7 @@ class FileBackedTaskManagerTest {
     void createNewSubtask() {
         Subtask newSubtask2 = new Subtask("name2", "description2", newEpic.getId());
 
-        fileBackedTaskManager.createNewSubtask(newSubtask2);
+        taskManager.createNewSubtask(newSubtask2);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -187,7 +193,7 @@ class FileBackedTaskManagerTest {
         Subtask savedSubtask = new Subtask("updatedName", "updatedDescription", newEpic.getId());
         savedSubtask.setId(newSubtask.getId());
 
-        fileBackedTaskManager.updateSubtask(savedSubtask);
+        taskManager.updateSubtask(savedSubtask);
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
@@ -197,12 +203,25 @@ class FileBackedTaskManagerTest {
 
     @Test
     void removeSubtaskById() {
-        fileBackedTaskManager.removeSubtaskById(newSubtask.getId());
+        taskManager.removeSubtaskById(newSubtask.getId());
 
         FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
 
         Assertions.assertTrue(tmpFbtm.getSubtasksList().isEmpty(),
                 "Задача не удалилась из файла");
+    }
+
+    //Общие тесты
+
+    @Test
+    void shouldLoadFromEmptyFile() throws IOException {
+        File file = File.createTempFile("tmp", ".txt");
+
+        taskManager = new FileBackedTaskManager(file);
+
+        Assertions.assertTrue(taskManager.getTasksList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertTrue(taskManager.getEpicsList().isEmpty(), "Что-то пошло не так.");
+        Assertions.assertTrue(taskManager.getSubtasksList().isEmpty(), "Что-то пошло не так.");
     }
 
     @Test
@@ -218,4 +237,19 @@ class FileBackedTaskManagerTest {
         Assertions.assertEquals(newSubtask, tmpFbtm.getSubtaskById(newSubtask.getId()),
                 "Подзадача не сохранилась или не подгрузилась");
     }
+
+    @Test
+    void getPrioritizedTasks() {
+        FileBackedTaskManager tmpFbtm = FileBackedTaskManager.loadFromFile(file);
+
+        List<Task> prioritizedTasksList = tmpFbtm.getPrioritizedTasks();
+
+        Assertions.assertNotEquals(0, prioritizedTasksList.size(),
+                "Задачи не сохраняются в список по приоритету или не подгрузились из файла");
+        Assertions.assertEquals(newSubtask, prioritizedTasksList.get(0),
+                "Задача не добавилась в список по приоритету или список не отсортирован");
+        Assertions.assertEquals(newTask, prioritizedTasksList.get(1),
+                "Задача не добавилась в список по приоритету или список не отсортирован");
+    }
+
 }
