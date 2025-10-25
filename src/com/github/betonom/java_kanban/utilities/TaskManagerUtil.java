@@ -101,18 +101,11 @@ public class TaskManagerUtil {
         if (task1.getStartTime() == null || task2.getStartTime() == null)
             return false;
 
-        if (task1.getStartTime().isBefore(task2.getStartTime())) {
-            if (task1.getEndTime().isBefore(task2.getStartTime())) {
-                return false;
-            } else {
-                return true;
-            }
+        if (task1.getStartTime().isBefore(task2.getEndTime())
+                && task2.getStartTime().isBefore(task1.getEndTime())) {
+            return true;
         } else {
-            if (task2.getEndTime().isBefore(task1.getStartTime())) {
-                return false;
-            } else {
-                return true;
-            }
+            return false;
         }
     }
 }
