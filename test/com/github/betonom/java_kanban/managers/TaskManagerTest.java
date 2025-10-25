@@ -3,6 +3,7 @@ package com.github.betonom.java_kanban.managers;
 import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
+import com.github.betonom.java_kanban.entities.TaskStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -224,6 +225,52 @@ abstract public class TaskManagerTest<T extends TaskManager> {
                 "Подзадача не удалена из эпика");
     }
 
+    // Разные тесты
+
+    @Test
+    void shouldNotSaveSubtaskInEpicWhenSubtaskIsTheEpic() {
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        Epic updatedEpic = new Epic("nameUpdated", "descriptionUpdated");
+        updatedEpic.setId(newEpic.getId());
+        for (Integer subtaskId : newEpic.getSubtasksId()) {
+            updatedEpic.getSubtasksId().add(subtaskId);
+        }
+        updatedEpic.getSubtasksId().add(newEpic.getId());
+        taskManager.updateEpic(updatedEpic);
+
+        Epic savedEpic = taskManager.getEpicById(updatedEpic.getId());
+
+        Assertions.assertNotEquals("nameUpdated", savedEpic.getName(),
+                "Эпик не может быть добавлен в себя же в качестве подзадачи");
+    }
+
+
+    @Test
+    void shouldNotSaveSubtaskWhenSubtaskIdEqualsEpicId() {
+        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
+        taskManager.createNewSubtask(newSubtask);
+
+        Subtask updatedSubtask = new Subtask("nameUpdated",
+                "descriptionUpdated", newSubtask.getId());
+        updatedSubtask.setId(newSubtask.getId());
+        taskManager.updateSubtask(updatedSubtask);
+
+        Subtask savedSubtask = taskManager.getSubtaskById(updatedSubtask.getId());
+
+        Assertions.assertEquals("name", savedSubtask.getName(),
+                "Подзадача не может быть собственным эпиком");
+    }
+
+    @Test
+    void shouldBeToDoWhenTaskCreated() {
+        Assertions.assertEquals(TaskStatus.TO_DO, newTask.getStatus(),
+                "При создании присваивается не статус TO_DO");
+    }
+
+    // Тесты пересечения задач
+
     @Test
     void getPrioritizedTasks() {
         List<Task> prioritizedTasksList = taskManager.getPrioritizedTasks();
@@ -234,6 +281,91 @@ abstract public class TaskManagerTest<T extends TaskManager> {
                 "Задача не добавилась в список по приоритету или список не отсортирован");
         Assertions.assertEquals(newTask, prioritizedTasksList.get(1),
                 "Задача не добавилась в список по приоритету или список не отсортирован");
+    }
+
+    @Test
+    void shouldNotCreateOfUpdateTaskOrSubtaskIfThereIsACross() {
+        Task task = new Task("taskName", "taskDesc");
+        task.setId(15);
+        task.setStartTime(LocalDateTime.of(2000, 1, 1, 2, 5));
+        task.setDuration(Duration.ofMinutes(10));
+        taskManager.createNewTask(task);
+
+        Assertions.assertNull(taskManager.getTaskById(task.getId()),
+                "Задача добавилась с пересечением");
+
+        Task updatedTask = new Task("updatedTask", "updatedTaskDesc");
+        updatedTask.setId(newTask.getId());
+        updatedTask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 4));
+        updatedTask.setDuration(Duration.ofMinutes(5));
+        taskManager.updateTask(updatedTask);
+
+        Assertions.assertNotEquals("updatedTask", taskManager.getTaskById(newTask.getId()).getName(),
+                "Задача обновилась с пересечением");
+
+        Subtask subtask = new Subtask("subtaskName", "subtaskDesc", newEpic.getId());
+        subtask.setId(20);
+        subtask.setStartTime(LocalDateTime.of(2000, 1, 1, 2, 5));
+        subtask.setDuration(Duration.ofMinutes(10));
+        taskManager.createNewSubtask(subtask);
+
+        Assertions.assertNull(taskManager.getSubtaskById(subtask.getId()),
+                "Подзадача добавилась с пересечением");
+
+        Task updatedSubtask = new Subtask("updatedSubtask", "updatedSubtaskDesc", newEpic.getId());
+        updatedSubtask.setId(newSubtask.getId());
+        updatedSubtask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 4));
+        updatedSubtask.setDuration(Duration.ofMinutes(5));
+        taskManager.updateTask(updatedSubtask);
+
+        Assertions.assertNotEquals("updatedTask", taskManager.getTaskById(newTask.getId()).getName(),
+                "Подзадача обновилась с пересечением");
+    }
+
+    // Тесты истории
+
+    @Test
+    void shouldGetDifferentTypeOfTasksIntoHistory() {
+
+        taskManager.getTaskById(newTask.getId());
+        taskManager.getEpicById(newEpic.getId());
+        taskManager.getSubtaskById(newSubtask.getId());
+
+        Assertions.assertEquals(3, taskManager.getHistory().size(),
+                "Задачи не добавились");
+        Assertions.assertEquals(newTask, taskManager.getHistory().get(0),
+                "Задачи не совпадают или задача не была добавлена");
+        Assertions.assertEquals(newEpic, taskManager.getHistory().get(1),
+                "Эпики не совпадают или эпик не был добавлен");
+        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(2),
+                "Подзадачи не совпадают или подзадача не была добавлена");
+    }
+
+    @Test
+    void shouldGetIntoHistoryWhenUsedGetTaskById() {
+
+        taskManager.getTaskById(newTask.getId());
+
+        Assertions.assertEquals(newTask, taskManager.getHistory().get(0),
+                "Задачи не совпадают или задача не была добавлена");
+    }
+
+    @Test
+    void shouldGetIntoHistoryWhenUsedGetEpicById() {
+
+        taskManager.getEpicById(newEpic.getId());
+
+        Assertions.assertEquals(newEpic, taskManager.getHistory().get(0),
+                "Эпики не совпадают или эпик не был добавлен");
+    }
+
+    @Test
+    void shouldGetIntoHistoryWhenUsedGetSubtaskById() {
+
+        taskManager.getSubtaskById(newSubtask.getId());
+
+        Assertions.assertEquals(newSubtask, taskManager.getHistory().get(0),
+                "Подзадачи не совпадают или подзадача не была добавлена");
     }
 
 }
