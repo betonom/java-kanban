@@ -1,5 +1,7 @@
 package com.github.betonom.java_kanban.entities;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,11 +9,14 @@ public class Task {
     protected String name;
     protected String description;
     protected TaskStatus status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.TO_DO;
+        this.duration = Duration.ofSeconds(0);
     }
 
     public int getId() {
@@ -48,6 +53,29 @@ public class Task {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        if (startTime != null && duration != null)
+            return startTime.plus(duration);
+
+        return null;
     }
 
     @Override
