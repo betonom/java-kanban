@@ -4,11 +4,14 @@ import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
+import com.github.betonom.java_kanban.exceptions.HasInteractionException;
+import com.github.betonom.java_kanban.exceptions.NotFoundException;
 import com.github.betonom.java_kanban.managers.HistoryManager;
 import com.github.betonom.java_kanban.managers.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
 import com.github.betonom.java_kanban.utilities.TaskManagerUtil;
 
+import java.sql.SQLOutput;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -39,11 +42,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void clearTasks() {
-        tasks.values().stream()
+        getTasksList().stream()
                 .peek(task -> historyManager.remove(task.getId()))
                 .filter(task -> task.getStartTime() != null)
                 .peek(task -> prioritizedTasks.remove(task))
-                .findAny();
+                .collect(Collectors.toList());
 
         tasks.clear();
     }
@@ -51,6 +54,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
+        if (task == null) {
+            throw new NotFoundException("Задача не найдена");
+        }
         historyManager.add(task);
         return task;
     }
@@ -61,7 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (isTaskCrossAnyOfTasks(task)) {
-            return;
+            throw new HasInteractionException("Задача пересекается с другими задачами");
         }
 
         task.setId(taskCounter);
@@ -78,10 +84,12 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (isTaskCrossAnyOfTasks(task)) {
-            return;
+            throw new HasInteractionException("Задача пересекается с другими задачами");
         }
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
+        } else {
+            throw new NotFoundException("Задача для обновления не найдена");
         }
     }
 
@@ -104,13 +112,15 @@ public class InMemoryTaskManager implements TaskManager {
     public void clearEpics() {
         epics.values().stream()
                 .peek(task -> historyManager.remove(task.getId()))
-                .findAny();
+                .collect(Collectors.toList());
+        ;
 
         subtasks.values().stream()
                 .peek(task -> historyManager.remove(task.getId()))
                 .filter(task -> task.getStartTime() != null)
                 .peek(task -> prioritizedTasks.remove(task))
-                .findAny();
+                .collect(Collectors.toList());
+        ;
         epics.clear();
         subtasks.clear();
     }
@@ -118,6 +128,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
+        if (epic == null) {
+            throw new NotFoundException("Задача не найдена");
+        }
         historyManager.add(epic);
         return epic;
     }
@@ -125,6 +138,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createNewEpic(Epic epic) {
         if (epic == null) {
+            return;
+        }
+
+        if (epic.getSubtasksId() == null) {
             return;
         }
 
@@ -148,6 +165,8 @@ public class InMemoryTaskManager implements TaskManager {
             setEpicTimeVariables(epic);
 
             epics.put(epic.getId(), epic);
+        } else {
+            throw new NotFoundException("Эпик для обновления не найден");
         }
     }
 
@@ -159,7 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(id);
         ArrayList<Integer> subtasksId = epic.getSubtasksId();
         while (!subtasksId.isEmpty()) {
-            removeSubtaskById(subtasksId.get(0));
+            removeSubtaskById(subtasksId.getFirst());
         }
 
         epics.remove(id);
@@ -186,12 +205,14 @@ public class InMemoryTaskManager implements TaskManager {
                 .peek(task -> historyManager.remove(task.getId()))
                 .filter(task -> task.getStartTime() != null)
                 .peek(task -> prioritizedTasks.remove(task))
-                .findAny();
+                .collect(Collectors.toList());
+        ;
 
         epics.values().stream()
                 .peek(epic -> epic.getSubtasksId().clear())
                 .peek(epic -> setEpicTimeVariables(epic))
-                .findAny();
+                .collect(Collectors.toList());
+        ;
 
         subtasks.clear();
     }
@@ -199,6 +220,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask getSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
+        if (subtask == null) {
+            throw new NotFoundException("Подзадача не найдена");
+        }
         historyManager.add(subtask);
         return subtask;
     }
@@ -209,7 +233,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (isTaskCrossAnyOfTasks(subtask)) {
-            return;
+            throw new HasInteractionException("Подзадача пересекается с другими задачами");
         }
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
@@ -234,7 +258,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         if (isTaskCrossAnyOfTasks(subtask)) {
-            return;
+            throw new HasInteractionException("Подзадача пересекается с другими задачами");
         }
         if (subtasks.containsKey(subtask.getId())) {
             //проверка на возможность добавления в эпик подзадачи самой подзадачи
@@ -256,6 +280,8 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(getStatusEpic(epic));
 
             setEpicTimeVariables(epic);
+        } else {
+            throw new NotFoundException("Подзадача для обновления не найдена");
         }
     }
 
@@ -321,8 +347,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void setEpicTimeVariables(Epic epic) {
+        epic.setDuration(Duration.ofSeconds(0));
         if (epic.getSubtasksId().isEmpty()) {
-            epic.setDuration(Duration.ofSeconds(0));
             return;
         }
 
