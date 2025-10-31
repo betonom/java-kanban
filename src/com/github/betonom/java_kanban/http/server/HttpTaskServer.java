@@ -1,8 +1,5 @@
 package com.github.betonom.java_kanban.http.server;
 
-import com.github.betonom.java_kanban.entities.Epic;
-import com.github.betonom.java_kanban.entities.Subtask;
-import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.http.handlers.*;
 import com.github.betonom.java_kanban.managers.Managers;
 import com.github.betonom.java_kanban.managers.TaskManager;
@@ -10,8 +7,6 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.time.Duration;
-import java.time.LocalDateTime;
 
 public class HttpTaskServer {
     private static final int PORT = 8080;
