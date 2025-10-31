@@ -64,10 +64,10 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
         subtask1c.setStatus(TaskStatus.DONE);
         taskManager.updateSubtask(subtask1c);
 
-        Subtask subtaskc = new Subtask("name 2", "description 2", newEpic.getId());
-        subtaskc.setId(newSubtask.getId());
-        subtaskc.setStatus(TaskStatus.DONE);
-        taskManager.updateSubtask(subtaskc);
+        Subtask subtasks = new Subtask("name 2", "description 2", newEpic.getId());
+        subtasks.setId(newSubtask.getId());
+        subtasks.setStatus(TaskStatus.DONE);
+        taskManager.updateSubtask(subtasks);
 
         Assertions.assertEquals(TaskStatus.DONE, newEpic.getStatus(),
                 "Статус не DONE при наличии статусов DONE у подзадач");
@@ -104,7 +104,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<TaskManager> {
         taskManager.createNewSubtask(subtask1);
 
         Subtask subtask2 = new Subtask("name 2", "description 2", newEpic.getId());
-        taskManager.createNewSubtask(subtask1);
+        taskManager.createNewSubtask(subtask2);
 
         Assertions.assertEquals(LocalDateTime.of(2020, 1, 1, 1, 6), newEpic.getEndTime(),
                 "Неправильный расчет поля endTime в Epic");

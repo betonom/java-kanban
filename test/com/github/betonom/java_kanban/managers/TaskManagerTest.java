@@ -4,6 +4,8 @@ import com.github.betonom.java_kanban.entities.Epic;
 import com.github.betonom.java_kanban.entities.Subtask;
 import com.github.betonom.java_kanban.entities.Task;
 import com.github.betonom.java_kanban.entities.TaskStatus;
+import com.github.betonom.java_kanban.exceptions.HasInteractionException;
+import com.github.betonom.java_kanban.exceptions.NotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,9 +80,9 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
         taskManager.removeTaskById(newTask.getId());
 
-        savedTask = taskManager.getTaskById(newTask.getId());
-
-        Assertions.assertNull(savedTask, "Задача не удалена");
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            taskManager.getTaskById(newTask.getId());
+        }, "Задача не удалена");
     }
 
     // Тесты Epic
@@ -150,11 +152,17 @@ abstract public class TaskManagerTest<T extends TaskManager> {
 
         taskManager.removeEpicById(newEpic.getId());
 
-        Assertions.assertNull(taskManager.getEpicById(newEpic.getId()), "Эпик не удалён");
-        Assertions.assertNull(taskManager.getSubtaskById(subtask1.getId()),
-                "Подзадачи не удаляются вместе с эпиком 1");
-        Assertions.assertNull(taskManager.getSubtaskById(subtask2.getId()),
-                "Подзадачи не удаляются вместе с эпиком 2");
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            taskManager.getEpicById(newEpic.getId());
+        }, "Эпик не удалён");
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            taskManager.getSubtaskById(subtask1.getId());
+        }, "Подзадачи не удаляются вместе с эпиком 1");
+
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            taskManager.getSubtaskById(subtask2.getId());
+        }, "Подзадачи не удаляются вместе с эпиком 2");
     }
 
     // Тесты Subtask
@@ -219,8 +227,10 @@ abstract public class TaskManagerTest<T extends TaskManager> {
     void removeSubtaskById() {
         taskManager.removeSubtaskById(newSubtask.getId());
 
-        Assertions.assertNull(taskManager.getSubtaskById(newSubtask.getId()),
-                "Подзадача не удалена");
+        Assertions.assertThrows(NotFoundException.class, () -> {
+            taskManager.getSubtaskById(newSubtask.getId());
+        }, "Подзадача не удалена");
+
         Assertions.assertEquals(0, newEpic.getSubtasksId().size(),
                 "Подзадача не удалена из эпика");
     }
@@ -289,37 +299,34 @@ abstract public class TaskManagerTest<T extends TaskManager> {
         task.setId(15);
         task.setStartTime(LocalDateTime.of(2000, 1, 1, 2, 5));
         task.setDuration(Duration.ofMinutes(10));
-        taskManager.createNewTask(task);
+        Assertions.assertThrows(HasInteractionException.class, () -> {
+            taskManager.createNewTask(task);
+        }, "Задача добавилась с пересечением");
 
-        Assertions.assertNull(taskManager.getTaskById(task.getId()),
-                "Задача добавилась с пересечением");
 
         Task updatedTask = new Task("updatedTask", "updatedTaskDesc");
         updatedTask.setId(newTask.getId());
         updatedTask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 4));
         updatedTask.setDuration(Duration.ofMinutes(5));
-        taskManager.updateTask(updatedTask);
-
-        Assertions.assertNotEquals("updatedTask", taskManager.getTaskById(newTask.getId()).getName(),
-                "Задача обновилась с пересечением");
+        Assertions.assertThrows(HasInteractionException.class, () -> {
+            taskManager.updateTask(updatedTask);
+        }, "Задача обновилась с пересечением");
 
         Subtask subtask = new Subtask("subtaskName", "subtaskDesc", newEpic.getId());
         subtask.setId(20);
         subtask.setStartTime(LocalDateTime.of(2000, 1, 1, 2, 5));
         subtask.setDuration(Duration.ofMinutes(10));
-        taskManager.createNewSubtask(subtask);
+        Assertions.assertThrows(HasInteractionException.class, () -> {
+            taskManager.createNewSubtask(subtask);
+        }, "Подзадача добавилась с пересечением");
 
-        Assertions.assertNull(taskManager.getSubtaskById(subtask.getId()),
-                "Подзадача добавилась с пересечением");
-
-        Task updatedSubtask = new Subtask("updatedSubtask", "updatedSubtaskDesc", newEpic.getId());
+        Subtask updatedSubtask = new Subtask("updatedSubtask", "updatedSubtaskDesc", newEpic.getId());
         updatedSubtask.setId(newSubtask.getId());
         updatedSubtask.setStartTime(LocalDateTime.of(2000, 1, 1, 1, 4));
         updatedSubtask.setDuration(Duration.ofMinutes(5));
-        taskManager.updateTask(updatedSubtask);
-
-        Assertions.assertNotEquals("updatedTask", taskManager.getTaskById(newTask.getId()).getName(),
-                "Подзадача обновилась с пересечением");
+        Assertions.assertThrows(HasInteractionException.class, () -> {
+            taskManager.updateSubtask(updatedSubtask);
+        }, "Подзадача обновилась с пересечением");
     }
 
     // Тесты истории
