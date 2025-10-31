@@ -22,10 +22,10 @@ public class HttpTaskServer {
         hts.start(PORT);
     }
 
-    public void start(int PORT) {
+    public void start(int port) {
 
         try {
-            serv = HttpServer.create(new InetSocketAddress(PORT), 0);
+            serv = HttpServer.create(new InetSocketAddress(port), 0);
         } catch (IOException e) {
             System.out.println("Не получилось создать сервер");
         }
@@ -37,7 +37,7 @@ public class HttpTaskServer {
         serv.createContext("/prioritized", new PrioritizedHandler(taskManager));
 
         serv.start();
-        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+        System.out.println("HTTP-сервер запущен на " + port + " порту!");
     }
 
     public void stop() {
