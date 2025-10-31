@@ -24,6 +24,7 @@ public class BaseHttpHandler {
                 .create();
         this.taskManager = taskManager;
     }
+
     protected void sendOk(HttpExchange exchange, String responseString) throws IOException {
         byte[] response = responseString.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().set("Content-Type", "application/json;charset=utf-8");
@@ -43,7 +44,7 @@ public class BaseHttpHandler {
         }
     }
 
-    protected void sendBadRequest(HttpExchange exchange, String responseString) throws IOException{
+    protected void sendBadRequest(HttpExchange exchange, String responseString) throws IOException {
         byte[] response = responseString.getBytes(StandardCharsets.UTF_8);
 
         try (OutputStream os = exchange.getResponseBody()) {

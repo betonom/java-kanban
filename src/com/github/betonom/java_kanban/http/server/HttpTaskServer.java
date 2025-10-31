@@ -22,31 +22,7 @@ public class HttpTaskServer {
         this.taskManager = taskManager;
     }
 
-    public static void main(String[] args) throws IOException {
-
-//        Task newTask2 = new Task("name2", "description2");
-//        newTask2.setDuration(Duration.ofMinutes(5));
-//        newTask2.setStartTime(LocalDateTime.of(3000, 1, 1, 2, 1));
-//        taskManager.createNewTask(newTask2);
-//
-//        Epic newEpic = new Epic("name", "description");
-//        taskManager.createNewEpic(newEpic);
-//
-//        Subtask newSubtask = new Subtask("name", "description", newEpic.getId());
-//        newSubtask.setDuration(Duration.ofMinutes(5));
-//        newSubtask.setStartTime(LocalDateTime.of(3000, 1, 1, 1, 1));
-//        taskManager.createNewSubtask(newSubtask);
-//
-//        HttpServer serv = HttpServer.create(new InetSocketAddress(PORT), 0);
-//
-//        serv.createContext("/tasks", new TaskHandler(taskManager));
-//        serv.createContext("/subtasks", new SubtaskHandler(taskManager));
-//        serv.createContext("/epics", new EpicHandler(taskManager));
-//        serv.createContext("/history", new HistoryHandler(taskManager));
-//        serv.createContext("/prioritized", new PrioritizedHandler(taskManager));
-//
-//        serv.start();
-//        System.out.println("HTTP-сервер запущен на " + PORT + " порту!");
+    public static void main(String[] args) {
         HttpTaskServer hts = new HttpTaskServer(Managers.getDefault());
         hts.start(PORT);
     }

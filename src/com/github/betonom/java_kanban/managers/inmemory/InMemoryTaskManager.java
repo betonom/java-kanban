@@ -96,7 +96,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTaskById(int id) {
         historyManager.remove(id);
-        if (tasks.get(id).getStartTime() != null)
+        Task task = tasks.get(id);
+        if (task == null) {
+            throw new NotFoundException("Задача не найдена");
+        }
+
+        if (task.getStartTime() != null)
             prioritizedTasks.remove(tasks.get(id));
         tasks.remove(id);
     }
@@ -173,9 +178,11 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeEpicById(int id) {
         historyManager.remove(id);
-
-
         Epic epic = epics.get(id);
+        if (epic == null) {
+            throw new NotFoundException("Задача не найдена");
+        }
+
         ArrayList<Integer> subtasksId = epic.getSubtasksId();
         while (!subtasksId.isEmpty()) {
             removeSubtaskById(subtasksId.getFirst());
@@ -288,7 +295,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtaskById(int id) {
         historyManager.remove(id);
-        if (subtasks.get(id).getStartTime() != null)
+        Subtask subtask = subtasks.get(id);
+        if (subtask == null) {
+            throw new NotFoundException("Подзадача не найдена");
+        }
+
+        if (subtask.getStartTime() != null)
             prioritizedTasks.remove(subtasks.get(id));
 
         int epicId = subtasks.get(id).getEpicId();
@@ -353,8 +365,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         List<Subtask> epicSubtasks = getEpicSubtasks(epic).stream()
-                .filter(subtask -> subtask.getStartTime() != null)
                 .peek(subtask -> epic.setDuration(epic.getDuration().plus(subtask.getDuration())))
+                .filter(subtask -> subtask.getStartTime() != null)
                 .sorted(Comparator.comparing(Task::getStartTime))
                 .collect(Collectors.toList());
 
