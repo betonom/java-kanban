@@ -6,14 +6,16 @@ import com.github.betonom.java_kanban.managers.TaskManager;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class BaseHttpHandler {
+public abstract class BaseHttpHandler implements HttpHandler {
     protected final Gson gson;
     protected final TaskManager taskManager;
 
@@ -78,5 +80,12 @@ public class BaseHttpHandler {
             exchange.sendResponseHeaders(500, response.length);
             os.write(response);
         }
+    }
+
+    protected String getStringRequest(HttpExchange exchange) throws IOException {
+        InputStream input = exchange.getRequestBody();
+        String request = new String(input.readAllBytes(), StandardCharsets.UTF_8);
+
+        return request;
     }
 }

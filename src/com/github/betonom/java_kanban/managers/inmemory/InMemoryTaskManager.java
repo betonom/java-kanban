@@ -190,10 +190,12 @@ public class InMemoryTaskManager implements TaskManager {
         epics.remove(id);
     }
 
-    public ArrayList<Subtask> getEpicSubtasks(Epic epic) {
+    public ArrayList<Subtask> getEpicSubtasks(int id) {
+        Epic epic = epics.get(id);
+
         return new ArrayList<>(
                 epic.getSubtasksId().stream()
-                        .map(id -> subtasks.get(id))
+                        .map(subtaskId -> subtasks.get(subtaskId))
                         .collect(Collectors.toList())
         );
     }
@@ -329,7 +331,7 @@ public class InMemoryTaskManager implements TaskManager {
         boolean isAllDone = true;
 
         // Получение массива подзадач из эпика
-        ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic);
+        ArrayList<Subtask> epicSubtasks = getEpicSubtasks(epic.getId());
 
         for (Subtask subtask : epicSubtasks) {
 
@@ -363,7 +365,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
 
-        List<Subtask> epicSubtasks = getEpicSubtasks(epic).stream()
+        List<Subtask> epicSubtasks = getEpicSubtasks(epic.getId()).stream()
                 .peek(subtask -> epic.setDuration(epic.getDuration().plus(subtask.getDuration())))
                 .filter(subtask -> subtask.getStartTime() != null)
                 .sorted(Comparator.comparing(Task::getStartTime))

@@ -2,11 +2,10 @@ package com.github.betonom.java_kanban.http.handlers;
 
 import com.github.betonom.java_kanban.managers.TaskManager;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 
-public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+public class HistoryHandler extends BaseHttpHandler {
 
     public HistoryHandler(TaskManager taskManager) {
         super(taskManager);
