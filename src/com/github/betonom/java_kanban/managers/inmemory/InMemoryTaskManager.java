@@ -193,6 +193,9 @@ public class InMemoryTaskManager implements TaskManager {
     public ArrayList<Subtask> getEpicSubtasks(int id) {
         Epic epic = epics.get(id);
 
+        if (epic == null) {
+            throw new NotFoundException("Эпик не найден");
+        }
         return new ArrayList<>(
                 epic.getSubtasksId().stream()
                         .map(subtaskId -> subtasks.get(subtaskId))
