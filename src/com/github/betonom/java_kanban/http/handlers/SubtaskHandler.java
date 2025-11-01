@@ -26,7 +26,7 @@ public class SubtaskHandler extends BaseHttpHandler {
 
         switch (method) {
             case "GET" -> {
-                if (pathParts[1].equals("subtask") && pathParts.length == 2) {
+                if (pathParts[1].equals("subtasks") && pathParts.length == 2) {
                     response = gson.toJson(taskManager.getSubtasksList());
                     sendOk(exchange, response);
                 }
