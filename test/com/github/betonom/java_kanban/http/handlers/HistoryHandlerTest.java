@@ -64,7 +64,7 @@ class HistoryHandlerTest {
     }
 
     @Test
-    void prioritizedGet() {
+    void historyGet() {
         taskManager.getTaskById(newTask.getId());
         taskManager.getSubtaskById(newSubtask.getId());
         taskManager.getEpicById(newEpic.getId());
@@ -78,13 +78,13 @@ class HistoryHandlerTest {
 
         Assertions.assertTrue(je.isJsonArray(), "Ответ сервера не соответствует ожидаемому");
 
-        JsonArray prioritizedJsonArr = je.getAsJsonArray();
+        JsonArray historyJsonArr = je.getAsJsonArray();
 
-        Assertions.assertNotEquals(0, prioritizedJsonArr.size(), "В ответе нет задач");
+        Assertions.assertNotEquals(0, historyJsonArr.size(), "В ответе нет задач");
 
-        JsonElement taskJson1 = prioritizedJsonArr.get(0);
-        JsonElement taskJson2 = prioritizedJsonArr.get(1);
-        JsonElement taskJson3 = prioritizedJsonArr.get(2);
+        JsonElement taskJson1 = historyJsonArr.get(0);
+        JsonElement taskJson2 = historyJsonArr.get(1);
+        JsonElement taskJson3 = historyJsonArr.get(2);
 
         Task task = gson.fromJson(taskJson1, Task.class);
         Subtask subtask = gson.fromJson(taskJson2, Subtask.class);
